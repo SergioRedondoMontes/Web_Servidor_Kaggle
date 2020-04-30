@@ -151,3 +151,44 @@ exports.login = async (req, res, next) => {
 El código anterior es muy similar al de registrarse. Para iniciar sesión, el usuario envía el correo electrónico y la contraseña utilizados al registrarse, la función **validatePassword** se utiliza para verificar que la contraseña sea correcta. Una vez hecho esto, podemos crear un nuevo token para ese usuario que reemplazará cualquier token emitido anteriormente. Idealmente, el usuario enviará ese token en el encabezado cuando intente acceder a cualquier ruta restringida.
 
 Eso es todo para la autenticación, luego crearemos los tres roles previamente especificados y también definiremos los permisos para cada rol.
+
+### Creando roles con AccessControl
+
+En esta sección, crearemos roles específicos y definiremos permisos en cada rol para acceder a los recursos. Haremos esto en el archivo `server/roles.js`, una vez más copie y pegue el código a continuación en ese archivo y lo revisaremos después de:
+
+```js
+// server/roles.js
+const AccessControl = require("accesscontrol");
+const ac = new AccessControl();
+
+exports.roles = (function () {
+  ac.grant("competidor")
+    .readOwn("profile")
+    .updateOwn("profile")
+    .deleteOwn("profile")
+    .readAny("challenge");
+
+  ac.grant("desafiador")
+    .extend("competidor")
+    .updateOwn("challenge")
+    .deleteOwn("challenge");
+
+  ac.grant("empleado").extend("desafiador").updateAny("challenge");
+
+  ac.grant("admin")
+    .extend("competidor")
+    .extend("desafiador")
+    .extend("empleado")
+    .readAny("profile")
+    .updateAny("profile")
+    .deleteAny("profile")
+    .deleteAny("challenge");
+
+  return ac;
+})();
+```
+
+Todos los roles y permisos se crearon usando el paquete **Accesscontrol**, proporciona algunos métodos útiles para crear roles y definir qué acciones puede realizar cada rol, el método **grant** se usa para crear un rol, mientras que métodos como **readAny**, **updateAny**, **deleteAny**, etc. ... se denominan atributos de acción porque definen qué acciones puede realizar cada rol en un recurso. El recurso, en este caso, es el perfil. Para mantener nuestra aplicación simple y al grano, definimos acciones mínimas para cada rol.
+
+La herencia entre roles se puede lograr utilizando el método **extend**, esto permite que un rol herede todos los atributos definidos en otro rol. El paquete **Accesscontrol** proporciona una gran cantidad de funciones.
+Puedes leer más sobre Accesscontrol [aquí](https://onury.io/accesscontrol/?api=ac).
