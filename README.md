@@ -119,3 +119,35 @@ Puedes establecer la variable a cualquier valor de tu elección:
 ```js
 JWT_SECRET={{YOUR_RANDOM_SECRET_VALUE}}
 ```
+
+### User Login
+
+Ahira configuremos el inicio de sesión del usuario, siga adelante y pegue el siguiente código en la parte inferior del archivo `server/controllers/userController.js`:
+
+```js
+// server/controllers/userController.js
+
+exports.login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return next(new Error("Email does not exist"));
+    const validPassword = await validatePassword(password, user.password);
+    if (!validPassword) return next(new Error("Password is not correct"));
+    const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    await User.findByIdAndUpdate(user._id, { accessToken });
+    res.status(200).json({
+      data: { email: user.email, role: user.role },
+      accessToken,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+```
+
+El código anterior es muy similar al de registrarse. Para iniciar sesión, el usuario envía el correo electrónico y la contraseña utilizados al registrarse, la función **validatePassword** se utiliza para verificar que la contraseña sea correcta. Una vez hecho esto, podemos crear un nuevo token para ese usuario que reemplazará cualquier token emitido anteriormente. Idealmente, el usuario enviará ese token en el encabezado cuando intente acceder a cualquier ruta restringida.
+
+Eso es todo para la autenticación, luego crearemos los tres roles previamente especificados y también definiremos los permisos para cada rol.
