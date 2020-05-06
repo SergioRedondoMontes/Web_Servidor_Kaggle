@@ -306,3 +306,43 @@ El middleware **allowIfLoggedIn** filtrará y solo otorgará acceso a los usuari
 El middleware **grantAccess**, por otro lado, permite que solo los usuarios con ciertos roles accedan a la ruta. Toma dos argumentos **action** y **resource**, **action** será un valor como **readAny**, **deleteAny**, etc. Esto indica qué acción puede realizar el usuario, mientras que el recurso representa qué **resource** tiene permiso para operar la acción definida, por ejemplo, el **perfil** o el **reto**. El método **roles.can (userRole) \[action](resource)** determina si el rol del usuario tiene permiso suficiente para realizar la acción especificada del recurso proporcionado. A continuación veremos exactamente cómo funciona esto.
 
 Creemos nuestras rutas y conectemos el middleware necesario, agregue el siguiente código al archivo `server/routes/route.js` :
+
+```js
+// server/routes/route.js
+const express = require("express");
+const router = express.Router();
+const userController = require("../controllers/userController");
+
+router.post("/signup", userController.signup);
+
+router.post("/login", userController.login);
+
+router.get(
+  "/user/:userId",
+  userController.allowIfLoggedin,
+  userController.getUser
+);
+
+router.get(
+  "/users",
+  userController.allowIfLoggedin,
+  userController.grantAccess("readAny", "profile"),
+  userController.getUsers
+);
+
+router.put(
+  "/user/:userId",
+  userController.allowIfLoggedin,
+  userController.grantAccess("updateAny", "profile"),
+  userController.updateUser
+);
+
+router.delete(
+  "/user/:userId",
+  userController.allowIfLoggedin,
+  userController.grantAccess("deleteAny", "profile"),
+  userController.deleteUser
+);
+
+module.exports = router;
+```
