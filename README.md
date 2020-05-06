@@ -346,3 +346,86 @@ router.delete(
 
 module.exports = router;
 ```
+
+Creamos nuestras rutas y conectamos las funciones creadas como middleware para imponer ciertas restricciones en algunas de estas rutas. Si observa detenidamente el middleware **grantAccess**, puede ver que especificamos que solo queremos otorgar acceso a los roles que pueden realizar la acción especificada en el recurso proporcionado.
+
+Por último, agreguemos el archivo del servidor base ubicado en `server/server.js` :
+
+```js
+// server/server.js
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const jwt = require("jsonwebtoken");
+const path = require("path");
+const User = require("./models/userModel");
+const routes = require("./routes/route.js");
+
+require("dotenv").config({
+  path: path.join(__dirname, "../.env"),
+});
+
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+mongoose.connect("mongodb://localhost:27017/rbac").then(() => {
+  console.log("Connected to the Database successfully");
+});
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(async (req, res, next) => {
+  if (req.headers["x-access-token"]) {
+    const accessToken = req.headers["x-access-token"];
+    const { userId, exp } = await jwt.verify(
+      accessToken,
+      process.env.JWT_SECRET
+    );
+    // Check if token has expired
+    if (exp < Date.now().valueOf() / 1000) {
+      return res.status(401).json({
+        error: "JWT token has expired, please login to obtain a new one",
+      });
+    }
+    res.locals.loggedInUser = await User.findById(userId);
+    next();
+  } else {
+    next();
+  }
+});
+
+app.use("/", routes);
+app.listen(PORT, () => {
+  console.log("Server is listening on Port:", PORT);
+});
+```
+
+En el archivo anterior, hicimos algunas configuraciones más, configuramos en qué puerto debería escuchar nuestro servidor, usamos **mongoose** para conectarnos a nuestro servidor MongoDB local y también configuramos algún otro middleware necesario.
+
+Hay un middleware importante arriba y lo veremos a continuación:
+
+```js
+...
+
+app.use(async (req, res, next) => {
+  if (req.headers["x-access-token"]) {
+   const accessToken = req.headers["x-access-token"];
+   const { userId, exp } = await jwt.verify(accessToken, process.env.JWT_SECRET);
+   // Check if token has expired
+   if (exp < Date.now().valueOf() / 1000) {
+    return res.status(401).json({
+     error: "JWT token has expired, please login to obtain a new one"
+    });
+   }
+   res.locals.loggedInUser = await User.findById(userId);
+   next();
+  } else {
+   next();
+  }
+});
+
+...
+```
+
+Recuerda, el usuario envía un token cada vez que desea acceder a una ruta segura. El middleware anterior recupera un token del encabezado **x-access-token**, luego usa la clave secreta utilizada para firmar el token para verificar que el token no ha sido comprometido. Cuando se completa esa verificación, el token se analiza y se recupera la identificación del usuario, también agregamos una verificación adicional para asegurarnos de que el token no haya expirado. Cuando se hace todo eso, la ID del usuario se usa para recuperar todos los demás detalles necesarios sobre el usuario y se almacena en una variable a la que puede acceder el middleware posterior.
