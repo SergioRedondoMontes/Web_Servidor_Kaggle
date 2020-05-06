@@ -152,7 +152,7 @@ El código anterior es muy similar al de registrarse. Para iniciar sesión, el u
 
 Eso es todo para la autenticación, luego crearemos los tres roles previamente especificados y también definiremos los permisos para cada rol.
 
-### Creando roles con AccessControl
+## Creando roles con AccessControl
 
 En esta sección, crearemos roles específicos y definiremos permisos en cada rol para acceder a los recursos. Haremos esto en el archivo `server/roles.js`, una vez más copie y pegue el código a continuación en ese archivo y lo revisaremos después de:
 
@@ -188,7 +188,115 @@ exports.roles = (function () {
 })();
 ```
 
-Todos los roles y permisos se crearon usando el paquete **Accesscontrol**, proporciona algunos métodos útiles para crear roles y definir qué acciones puede realizar cada rol, el método **grant** se usa para crear un rol, mientras que métodos como **readAny**, **updateAny**, **deleteAny**, etc. ... se denominan atributos de acción porque definen qué acciones puede realizar cada rol en un recurso. El recurso, en este caso, es el perfil. Para mantener nuestra aplicación simple y al grano, definimos acciones mínimas para cada rol.
+Todos los roles y permisos se crearon usando el paquete **Accesscontrol**, proporciona algunos métodos útiles para crear roles y definir qué acciones puede realizar cada rol, el método **grant** se usa para crear un rol, mientras que métodos como **readAny**, **updateAny**, **deleteAny**, etc. ... se denominan atributos de acción porque definen qué acciones puede realizar cada rol en un recurso. El recurso, en este caso, es el perfil y los retos. Para mantener nuestra aplicación simple y al grano, definimos acciones mínimas para cada rol.
 
 La herencia entre roles se puede lograr utilizando el método **extend**, esto permite que un rol herede todos los atributos definidos en otro rol. El paquete **Accesscontrol** proporciona una gran cantidad de funciones.
 Puedes leer más sobre Accesscontrol [aquí](https://onury.io/accesscontrol/?api=ac).
+
+## Configuración de las rutas
+
+A continuación, crearemos rutas para las diferentes partes de nuestra aplicación. Algunas de estas rutas contienen recursos que queremos limitar solo a usuarios con roles específicos.
+
+Pero antes de eso, configuremos la lógica de las rutas, funciones que se conectarán como middlewares en las diversas rutas.
+
+Una vez más, pegue el siguiente código en la parte inferior del archivo `server/controllers/userController` :
+
+```js
+...
+
+// server/controllers/userController.js
+
+exports.getUsers = async (req, res, next) => {
+  const users = await User.find({});
+  res.status(200).json({
+    data: users,
+  });
+};
+
+exports.getUser = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+    if (!user) return next(new Error("User does not exist"));
+    res.status(200).json({
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateUser = async (req, res, next) => {
+  try {
+    const update = req.body;
+    const userId = req.params.userId;
+    await User.findByIdAndUpdate(userId, update);
+    const user = await User.findById(userId);
+    res.status(200).json({
+      data: user,
+      message: "User has been updated",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteUser = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    await User.findByIdAndDelete(userId);
+    res.status(200).json({
+      data: null,
+      message: "User has been deleted",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+...
+```
+
+Las funciones anteriores son bastante sencillas y se pueden entender fácilmente sin mucha explicación. Ahora centrémonos en crear middleware para restringir el acceso solo a los usuarios registrados y también un middleware para permitir el acceso solo a usuarios con roles específicos.
+
+Una vez más, pegue el siguiente código en la parte inferior del archivo `server/controllers/userController.js` :
+
+```js
+// server/controllers/userController.js
+
+...
+
+// Add this line to the top of the file
+const { roles } = require('../roles')
+
+exports.grantAccess = function(action, resource) {
+ return async (req, res, next) => {
+  try {
+   const permission = roles.can(req.user.role)[action](resource);
+   if (!permission.granted) {
+    return res.status(401).json({
+     error: "You don't have enough permission to perform this action"
+    });
+   }
+   next()
+  } catch (error) {
+   next(error)
+  }
+ }
+}
+
+exports.allowIfLoggedin = async (req, res, next) => {
+ try {
+  const user = res.locals.loggedInUser;
+  if (!user)
+   return res.status(401).json({
+    error: "You need to be logged in to access this route"
+   });
+   req.user = user;
+   next();
+  } catch (error) {
+   next(error);
+  }
+}
+
+```
