@@ -300,3 +300,9 @@ exports.allowIfLoggedin = async (req, res, next) => {
 }
 
 ```
+
+El middleware **allowIfLoggedIn** filtrará y solo otorgará acceso a los usuarios que hayan iniciado sesión, la variable **res.locals.loggedInUser** contiene los detalles del usuario que ha iniciado sesión, rellenaremos esta variable muy pronto.
+
+El middleware **grantAccess**, por otro lado, permite que solo los usuarios con ciertos roles accedan a la ruta. Toma dos argumentos **action** y **resource**, **action** será un valor como **readAny**, **deleteAny**, etc. Esto indica qué acción puede realizar el usuario, mientras que el recurso representa qué **resource** tiene permiso para operar la acción definida, por ejemplo, el **perfil** o el **reto**. El método **roles.can (userRole) \[action](resource)** determina si el rol del usuario tiene permiso suficiente para realizar la acción especificada del recurso proporcionado. A continuación veremos exactamente cómo funciona esto.
+
+Creemos nuestras rutas y conectemos el middleware necesario, agregue el siguiente código al archivo `server/routes/route.js` :
