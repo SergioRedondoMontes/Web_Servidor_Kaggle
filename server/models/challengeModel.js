@@ -11,9 +11,6 @@ const ChallengeSchema = new Schema({
     type: String,
     required: true,
   },
-  accessToken: {
-    type: String,
-  },
 });
 
 const User = mongoose.model("challenge", ChallengeSchema);
