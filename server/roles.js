@@ -11,6 +11,7 @@ exports.roles = (function () {
 
   ac.grant("desafiador")
     .extend("competidor")
+    .createAny("challenge")
     .updateOwn("challenge")
     .deleteOwn("challenge");
 
