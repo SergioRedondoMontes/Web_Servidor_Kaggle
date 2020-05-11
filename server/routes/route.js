@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
+const middleWare = require("../middlewares");
 const challengeController = require("../controllers/challengeController");
 
 router.post("/signup", userController.signup);
@@ -10,8 +11,9 @@ router.post("/login", userController.login);
 
 //Users routes
 router.get(
-  "/user/:userId",
+  "/users/:userId",
   userController.allowIfLoggedin,
+  middleWare.profile.checkAccessActionProfile("read"),
   userController.getUser
 );
 
@@ -23,14 +25,14 @@ router.get(
 );
 
 router.put(
-  "/user/:userId",
+  "/users/:userId",
   userController.allowIfLoggedin,
   userController.grantAccess("updateAny", "profile"),
   userController.updateUser
 );
 
 router.delete(
-  "/user/:userId",
+  "/users/:userId",
   userController.allowIfLoggedin,
   userController.grantAccess("deleteAny", "profile"),
   userController.deleteUser
@@ -38,7 +40,7 @@ router.delete(
 
 //Challenge routes
 router.get(
-  "/challenge/:challengeId",
+  "/challenges/:challengeId",
   challengeController.allowIfLoggedin,
   challengeController.getChallenge
 );
@@ -51,25 +53,26 @@ router.get(
 );
 
 router.post(
-  "/challenge",
+  "/challenges",
   challengeController.allowIfLoggedin,
   challengeController.grantAccess("createAny", "challenge"),
   challengeController.postChallenge
 );
 
 router.put(
-  "/challenge/:challengeId",
+  "/challenges/:challengeId",
   challengeController.allowIfLoggedin,
   //si es mio
-  challengeController.grantAccess("updateOwn", "challenge"),
+  // challengeController.grantAccess("updateOwn", "challenge"),
   //si es mio o de otro
   //challengeController.grantAccess("updateAny", "challenge"),
   //mismo endpoint para ambas cosas
+  middleWare.challenge.checkAccessActionChallenge("update"),
   challengeController.updateChallenge
 );
 
 router.delete(
-  "/challenge/:challengeId",
+  "/challenges/:challengeId",
   challengeController.allowIfLoggedin,
   challengeController.grantAccess("deleteAny", "challenge"),
   challengeController.deleteChallenge

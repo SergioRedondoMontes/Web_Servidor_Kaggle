@@ -3,24 +3,24 @@ const AccessControl = require("accesscontrol");
 const ac = new AccessControl();
 
 exports.roles = (function () {
-  ac.grant("competidor")
+  ac.grant("player")
     .readOwn("profile")
     .updateOwn("profile")
     .deleteOwn("profile")
     .readAny("challenge");
 
-  ac.grant("desafiador")
-    .extend("competidor")
+  ac.grant("challenger")
+    .extend("player")
     .createAny("challenge")
     .updateOwn("challenge")
     .deleteOwn("challenge");
 
-  ac.grant("empleado").extend("desafiador").updateAny("challenge");
+  ac.grant("employee").extend("challenger").updateAny("challenge");
 
   ac.grant("admin")
-    .extend("competidor")
-    .extend("desafiador")
-    .extend("empleado")
+    .extend("player")
+    .extend("challenger")
+    .extend("employee")
     .readAny("profile")
     .updateAny("profile")
     .deleteAny("profile")

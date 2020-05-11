@@ -11,6 +11,10 @@ const ChallengeSchema = new Schema({
     type: String,
     required: true,
   },
+  owner: {
+    type: String,
+    required: true,
+  },
 });
 
 const Challenge = mongoose.model("challenge", ChallengeSchema);

@@ -9,6 +9,7 @@ exports.postChallenge = async (req, res, next) => {
     const newChallenge = new Challenge({
       title,
       description,
+      owner: req.user._id,
     });
     await newChallenge.save();
     res.json({

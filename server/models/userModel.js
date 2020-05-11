@@ -14,8 +14,8 @@ const UserSchema = new Schema({
   },
   role: {
     type: String,
-    default: "competidor",
-    enum: ["competidor", "desafiador", "empleado", "admin"],
+    default: "player",
+    enum: ["player", "challenger", "employee", "admin"],
   },
   accessToken: {
     type: String,
