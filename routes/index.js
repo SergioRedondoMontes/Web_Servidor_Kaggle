@@ -5,8 +5,21 @@ const userController = require("../controllers/userController");
 const middleWare = require("../middlewares");
 const challengeController = require("../controllers/challengeController");
 
+// NOT LOGGED IN VIEWS
+
+router.get("/", (req, res) => {
+  const user = res.locals.loggedInUser;
+  console.log("user logged", user);
+});
+
+router.get("/signup", (req, res) => {
+  res.render("signup");
+});
 router.post("/signup", userController.signup);
 
+router.get("/login", (req, res) => {
+  res.render("login");
+});
 router.post("/login", userController.login);
 
 //Users routes

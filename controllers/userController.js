@@ -42,6 +42,7 @@ exports.signup = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   try {
+    console.log("env ", process.env.JWT_SECRET);
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) return next(new Error("Email does not exist"));
