@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -12,6 +12,7 @@ import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
+import Alert from "@material-ui/lab/Alert";
 
 import { Helmet } from "react-helmet";
 
@@ -61,15 +62,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignInSide() {
+export default function SignInSide(props) {
   const classes = useStyles();
 
+  const [email, setEmail] = useState(props.email || "");
+
+  const handleAlert = () => {
+    switch (props.alert) {
+      case "email":
+        return <Alert severity="error">Email incorrecto</Alert>;
+      case "password":
+        return <Alert severity="error">Email o contraseña incorrectos</Alert>;
+      default:
+        return null;
+    }
+  };
   return (
     <Grid container component="main" className={classes.root}>
       <Helmet>
         <title>KAGGLE | LOGIN</title>
       </Helmet>
-      <CssBaseline />
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
         <div className={classes.paper}>
@@ -80,6 +92,7 @@ export default function SignInSide() {
             Sign in
           </Typography>
           <form className={classes.form} method="post" action="/login">
+            {handleAlert()}
             <TextField
               variant="outlined"
               margin="normal"
@@ -90,6 +103,10 @@ export default function SignInSide() {
               name="email"
               autoComplete="email"
               autoFocus
+              value={email || ""}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
             />
             <TextField
               variant="outlined"
@@ -122,7 +139,7 @@ export default function SignInSide() {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="/login" variant="body2">
+                <Link href="/signup" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

@@ -8,9 +8,13 @@ const User = require("./models/userModel");
 const routes = require("./routes");
 const register = require("@react-ssr/express/register");
 
+const cookieParser = require("cookie-parser");
+
 const app = express();
 (async () => {
   await register(app);
+
+  app.use(cookieParser());
 
   require("dotenv").config({
     path: path.join(__dirname, "../.env"),
@@ -24,6 +28,7 @@ const app = express();
   app.use(bodyParser.urlencoded({ extended: true }));
 
   app.use(async (req, res, next) => {
+    // CHECK EXISTS ACCESS TOKEN IN HEADERS
     if (req.headers["x-access-token"]) {
       const accessToken = req.headers["x-access-token"];
       const { userId, exp } = await jwt.verify(
@@ -39,7 +44,24 @@ const app = express();
       res.locals.loggedInUser = await User.findById(userId);
       next();
     } else {
-      next();
+      // CHECK EXISTS ACCESS TOKEN IN COOKIE
+      if (req.cookies["authorization-kaggle"]) {
+        const accessToken = req.cookies["authorization-kaggle"];
+        const { userId, exp } = await jwt.verify(
+          accessToken,
+          process.env.JWT_SECRET
+        );
+        // Check if token has expired
+        if (exp < Date.now().valueOf() / 1000) {
+          return res.status(401).json({
+            error: "JWT token has expired, please login to obtain a new one",
+          });
+        }
+        res.locals.loggedInUser = await User.findById(userId);
+        next();
+      } else {
+        next();
+      }
     }
   });
 
