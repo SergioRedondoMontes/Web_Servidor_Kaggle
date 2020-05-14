@@ -38,4 +38,20 @@ router.get("/login", (req, res) => {
 
 router.get("/users", controllers.staff.getUsers);
 
+router.get("/users/:userId", controllers.staff.getUser);
+
+router.put("/users/:userId", controllers.staff.updateUser);
+
+router.delete("/users/:userId", controllers.staff.deleteUser);
+
+router.get("/challenges", controllers.staff.getChallenges);
+
+router.get("/challenges/:challengeId", controllers.staff.getChallenge);
+
+router.post("/challenges", controllers.staff.postChallenge);
+
+router.put("/challenges/:challengeId", controllers.staff.updateChallenge);
+
+router.delete("/challenges/:challengeId", controllers.staff.deleteChallenge);
+
 module.exports = router;

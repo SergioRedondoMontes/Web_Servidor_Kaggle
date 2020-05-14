@@ -35,6 +35,8 @@ router.get("/challenges", controllers.common.getChallenges);
 
 router.get("/challenges/:challengeId", controllers.common.getChallenge);
 
+router.post("/challenges", controllers.common.postChallenge);
+
 router.put("/challenges/:challengeId", controllers.common.updateChallenge);
 
 router.delete("/challenges/:challengeId", controllers.common.deleteChallenge);

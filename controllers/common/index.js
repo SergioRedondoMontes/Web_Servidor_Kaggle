@@ -101,6 +101,23 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
+exports.postChallenge = async (req, res, next) => {
+  try {
+    const { title, description } = req.body;
+    const newChallenge = new Challenge({
+      title,
+      description,
+      owner: req.user._id,
+    });
+    await newChallenge.save();
+    res.json({
+      data: newChallenge,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.getChallenges = async (req, res, next) => {
   try {
     const challenges = await Challenge.find({});
