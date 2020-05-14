@@ -25,4 +25,18 @@ router.get("/", (req, res) => {
   });
 });
 
+router.get("/users/:userId", controllers.common.getUser);
+
+router.put("/users/:userId", controllers.common.updateUser);
+
+router.delete("/users/:userId", controllers.common.deleteUser);
+
+router.get("/challenges", controllers.common.getChallenges);
+
+router.get("/challenges/:challengeId", controllers.common.getChallenge);
+
+router.put("/challenges/:challengeId", controllers.common.updateChallenge);
+
+router.delete("/challenges/:challengeId", controllers.common.deleteChallenge);
+
 module.exports = router;

@@ -7,10 +7,12 @@ const router = express.Router();
 // const controller = require("../controllers");
 const common = require("./common");
 const admin = require("./admin");
+const staff = require("./staff");
 
 // NOT LOGGED IN VIEWS
 router.use("/", common);
 router.use("/admin", admin);
+router.use("/staff", staff);
 
 //Users routes
 // router.get(
