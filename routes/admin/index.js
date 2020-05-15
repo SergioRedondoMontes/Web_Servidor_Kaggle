@@ -36,6 +36,8 @@ router.get("/login", (req, res) => {
 
 router.post("/login", controllers.admin.login);
 
+router.post("/users", controllers.admin.postUser);
+
 router.get("/users", controllers.admin.getUsers);
 
 router.get("/employee", controllers.admin.getEmployees);
@@ -44,15 +46,33 @@ router.get("/users/:userId", controllers.admin.getUser);
 
 router.put("/users/:userId", controllers.admin.updateUser);
 
+router.put("/users/:userId/resetPassword", controllers.admin.resetPassword);
+
 router.delete("/users/:userId", controllers.admin.deleteUser);
 
 router.get("/challenges", controllers.admin.getChallenges);
 
 router.get("/challenges/:challengeId", controllers.admin.getChallenge);
 
-router.post("/challenges", controllers.admin.postChallenge);
+router.post(
+  "/challenges",
+  middleWares.auth.checkLoggedIn,
+  controllers.admin.postChallenge
+);
 
 router.put("/challenges/:challengeId", controllers.admin.updateChallenge);
+
+router.put(
+  "/challenges/:challengeId/participants",
+  middleWares.auth.checkLoggedIn,
+  controllers.admin.updateParticipants
+);
+
+router.put(
+  "/challenges/:challengeId/ranking",
+  middleWares.auth.checkLoggedIn,
+  controllers.admin.updateRanking
+);
 
 router.delete("/challenges/:challengeId", controllers.admin.deleteChallenge);
 

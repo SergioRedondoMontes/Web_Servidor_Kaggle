@@ -14,12 +14,25 @@ async function validatePassword(plainPassword, hashedPassword) {
 
 exports.signup = async (req, res, next) => {
   try {
-    const { email, password, role } = req.body;
+    const {
+      username,
+      name,
+      surname,
+      email,
+      password,
+      role,
+      payment,
+    } = req.body;
     const hashedPassword = await hashPassword(password);
     const newUser = new User({
+      username,
+      name,
+      surname,
       email,
       password: hashedPassword,
       role: role || "player",
+      payment,
+      resetPassword: false,
     });
     const accessToken = jwt.sign(
       { userId: newUser._id },
@@ -30,10 +43,13 @@ exports.signup = async (req, res, next) => {
     );
     newUser.accessToken = accessToken;
     await newUser.save();
+    res.send("entro");
     res.cookie("authorization-kaggle", accessToken);
-    res.redirect("/");
+    // res.redirect("/");
   } catch (error) {
-    res.render("common/signup");
+    res.send(error);
+
+    // res.render("common/signup");
   }
 };
 
@@ -54,7 +70,11 @@ exports.login = async (req, res, next) => {
     });
     await User.findByIdAndUpdate(user._id, { accessToken });
     res.cookie("authorization-kaggle", accessToken);
-    res.redirect("/");
+    if (!user.restPassword) {
+      res.redirect("/");
+    } else {
+      //TODO: render form change password / updateUser()
+    }
   } catch (error) {
     res.render("common/login");
   }
@@ -108,6 +128,9 @@ exports.postChallenge = async (req, res, next) => {
       title,
       description,
       owner: req.user._id,
+      participant: [],
+      ranking: [],
+      url_files: ["url1", "url2"],
     });
     await newChallenge.save();
     res.json({
@@ -152,6 +175,63 @@ exports.updateChallenge = async (req, res, next) => {
       data: challenge,
       message: "Challenge has been updated",
     });
+  } catch (error) {
+    next(error);
+  }
+};
+exports.updateParticipats = async (req, res, next) => {
+  try {
+    const update = req.body;
+    const challengeId = req.params.challengeId;
+    await Challenge.findByIdAndUpdate(
+      challengeId,
+      {
+        $addToSet: {
+          participant: {
+            userId: req.user._id,
+            username: req.user.username,
+          },
+        },
+      },
+      function (err, updatedChallenge) {
+        if (err) throw err;
+        const challenge = updatedChallenge;
+        res.status(200).json({
+          data: challenge,
+          message: "Challenge has been updated",
+        });
+      }
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateRanking = async (req, res, next) => {
+  try {
+    const update = req.body;
+    const challengeId = req.params.challengeId;
+    await Challenge.findByIdAndUpdate(
+      challengeId,
+      {
+        $addToSet: {
+          ranking: {
+            userId: req.user._id,
+            username: req.user.username,
+            score,
+            date: new Date(),
+          },
+        },
+      },
+      function (err, updatedChallenge) {
+        if (err) throw err;
+        const challenge = updatedChallenge;
+        res.status(200).json({
+          data: challenge,
+          message: "Challenge has been updated",
+        });
+      }
+    );
   } catch (error) {
     next(error);
   }

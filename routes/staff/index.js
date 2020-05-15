@@ -38,9 +38,13 @@ router.get("/login", (req, res) => {
 
 router.get("/users", controllers.staff.getUsers);
 
+router.post("/users", controllers.staff.postUser);
+
 router.get("/users/:userId", controllers.staff.getUser);
 
 router.put("/users/:userId", controllers.staff.updateUser);
+
+router.put("/users/:userId/resetPassword", controllers.staff.resetPassword);
 
 router.delete("/users/:userId", controllers.staff.deleteUser);
 
@@ -48,10 +52,26 @@ router.get("/challenges", controllers.staff.getChallenges);
 
 router.get("/challenges/:challengeId", controllers.staff.getChallenge);
 
-router.post("/challenges", controllers.staff.postChallenge);
+router.post(
+  "/challenges",
+  middleWares.auth.checkLoggedIn,
+  controllers.staff.postChallenge
+);
 
 router.put("/challenges/:challengeId", controllers.staff.updateChallenge);
 
 router.delete("/challenges/:challengeId", controllers.staff.deleteChallenge);
+
+router.put(
+  "/challenges/:challengeId/participants",
+  middleWares.auth.checkLoggedIn,
+  controllers.staff.updateParticipants
+);
+
+router.put(
+  "/challenges/:challengeId/ranking",
+  middleWares.auth.checkLoggedIn,
+  controllers.staff.updateRanking
+);
 
 module.exports = router;

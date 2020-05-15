@@ -41,4 +41,16 @@ router.put("/challenges/:challengeId", controllers.common.updateChallenge);
 
 router.delete("/challenges/:challengeId", controllers.common.deleteChallenge);
 
+router.put(
+  "/challenges/:challengeId/participants",
+  middleWares.auth.checkLoggedIn,
+  controllers.common.updateParticipats
+);
+
+router.put(
+  "/challenges/:challengeId/ranking",
+  middleWares.auth.checkLoggedIn,
+  controllers.common.updateRanking
+);
+
 module.exports = router;

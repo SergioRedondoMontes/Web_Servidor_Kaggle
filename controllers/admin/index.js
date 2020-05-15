@@ -1,4 +1,5 @@
 const User = require("../../models/userModel");
+const Challenge = require("../../models/challengeModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { roles } = require("../../roles");
@@ -32,6 +33,35 @@ exports.login = async (req, res, next) => {
     res.redirect("/admin/home");
   } catch (error) {
     res.render("admin/login");
+  }
+};
+
+exports.postUser = async (req, res, next) => {
+  try {
+    const { username, name, surname, email, role, payment } = req.body;
+    const hashedPassword = await hashPassword("password");
+    const newUser = new User({
+      username,
+      name,
+      surname,
+      email,
+      password: hashedPassword,
+      role: role || "player",
+      payment,
+      resetPassword: false,
+    });
+    const accessToken = jwt.sign(
+      { userId: newUser._id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+    newUser.accessToken = accessToken;
+    await newUser.save();
+    res.redirect("/admin/users");
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -72,6 +102,20 @@ exports.updateUser = async (req, res, next) => {
   }
 };
 
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    await User.findByIdAndUpdate(userId, { $set: { resetPassword: true } });
+    const user = await User.findById(userId);
+    res.status(200).json({
+      data: user,
+      message: "User has been updated",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.deleteUser = async (req, res, next) => {
   try {
     const userId = req.params.userId;
@@ -87,11 +131,14 @@ exports.deleteUser = async (req, res, next) => {
 
 exports.postChallenge = async (req, res, next) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, url_files } = req.body;
     const newChallenge = new Challenge({
       title,
       description,
       owner: req.user._id,
+      participant: [],
+      ranking: [],
+      url_files: ["url1", "url2"],
     });
     await newChallenge.save();
     res.json({
@@ -132,6 +179,63 @@ exports.updateChallenge = async (req, res, next) => {
       data: challenge,
       message: "Challenge has been updated",
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateParticipants = async (req, res, next) => {
+  try {
+    const challengeId = req.params.challengeId;
+    await Challenge.findByIdAndUpdate(
+      challengeId,
+      {
+        $addToSet: {
+          participant: {
+            userId: req.user._id,
+            username: req.user.username,
+          },
+        },
+      },
+      function (err, updatedChallenge) {
+        if (err) throw err;
+        const challenge = updatedChallenge;
+        res.status(200).json({
+          data: challenge,
+          message: "Challenge has been updated",
+        });
+      }
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateRanking = async (req, res, next) => {
+  try {
+    const { score } = req.body;
+    const challengeId = req.params.challengeId;
+    await Challenge.findByIdAndUpdate(
+      challengeId,
+      {
+        $addToSet: {
+          ranking: {
+            userId: req.user._id,
+            username: req.user.username,
+            score,
+            date: new Date(),
+          },
+        },
+      },
+      function (err, updatedChallenge) {
+        if (err) throw err;
+        const challenge = updatedChallenge;
+        res.status(200).json({
+          data: challenge,
+          message: "Challenge has been updated",
+        });
+      }
+    );
   } catch (error) {
     next(error);
   }

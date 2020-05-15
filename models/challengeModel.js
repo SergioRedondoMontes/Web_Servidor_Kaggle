@@ -2,20 +2,56 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const ChallengeSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
+const ChallengeSchema = new Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    owner: {
+      type: String,
+      required: true,
+    },
+    participant: [
+      {
+        userId: {
+          type: String,
+        },
+        username: {
+          type: String,
+        },
+        _id: false,
+      },
+    ],
+    ranking: [
+      {
+        userId: {
+          type: String,
+        },
+        username: {
+          type: String,
+        },
+        score: {
+          type: Number,
+        },
+        date: {
+          type: Date,
+        },
+      },
+    ],
+    url_files: [String],
   },
-  description: {
-    type: String,
-    required: true,
-  },
-  owner: {
-    type: String,
-    required: true,
-  },
-});
+  {
+    timestamps: {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  }
+);
 
 const Challenge = mongoose.model("challenge", ChallengeSchema);
 
