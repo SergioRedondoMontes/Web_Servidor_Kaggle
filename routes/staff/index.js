@@ -3,6 +3,7 @@ const router = express.Router();
 const middleWares = require("../../middlewares");
 const controllers = require("../../controllers");
 
+// LOGIC INITIAL
 router.get(
   "/",
   //   middleWares.auth.checkLoggedIn,
@@ -22,6 +23,21 @@ router.get(
   }
 );
 
+// AUTH ROUTES
+
+router.post("/login", controllers.staff.login);
+
+router.get("/signout", (req, res) => {
+  res.clearCookie("authorization-kaggle");
+  res.redirect("/");
+});
+
+router.get("/login", (req, res) => {
+  res.render("staff/login");
+});
+
+// END AUTH ROUTES
+
 router.get(
   "/home",
   middleWares.auth.checkLoggedIn,
@@ -30,11 +46,8 @@ router.get(
     res.send("esto funciona porque estas logged in");
   }
 );
-router.get("/login", (req, res) => {
-  res.render("staff/login");
-});
 
-// router.post("/login", controllers.staff.login);
+// USER ROUTES
 
 router.get(
   "/users",
@@ -63,6 +76,9 @@ router.put("/users/:userId/resetPassword", controllers.staff.resetPassword);
 
 router.delete("/users/:userId", controllers.staff.deleteUser);
 
+// END USER ROUTES
+
+// CHALLENGER ROUTES
 router.get("/challenges", controllers.staff.getChallenges);
 
 router.get("/challenges/:challengeId", controllers.staff.getChallenge);
@@ -88,5 +104,7 @@ router.put(
   middleWares.auth.checkLoggedIn,
   controllers.staff.updateRanking
 );
+
+// END CHALLENGE ROUTES
 
 module.exports = router;

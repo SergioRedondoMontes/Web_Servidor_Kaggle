@@ -88,7 +88,7 @@ const AppBar = (props) => {
           </>
         );
         break;
-      case "staff":
+      case "employee":
         return (
           <>
             <MenuItem>

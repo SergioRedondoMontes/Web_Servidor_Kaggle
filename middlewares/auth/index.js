@@ -41,7 +41,7 @@ exports.checkAuthAdmin = function (req, res, next) {
 
 exports.checkAuthStaff = function (req, res, next) {
   if (req.user) {
-    if (req.user.role === "staff") {
+    if (req.user.role === "employee") {
       next();
     } else {
       res.redirect("/");

@@ -4,6 +4,37 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { roles } = require("../../roles");
 
+async function hashPassword(password) {
+  return await bcrypt.hash(password, 10);
+}
+
+async function validatePassword(plainPassword, hashedPassword) {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+}
+
+exports.login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({
+      email,
+      role: "employee",
+    });
+    if (!user) res.render("staff/login", { alert: "email", email: email });
+    console.log(user);
+    const validPassword = await validatePassword(password, user.password);
+    if (!validPassword)
+      res.render("staff/login", { alert: "password", email: email });
+    const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    await User.findByIdAndUpdate(user._id, { accessToken });
+    res.cookie("authorization-kaggle", accessToken);
+    res.redirect("/staff/home");
+  } catch (error) {
+    res.render("staff/login");
+  }
+};
+
 exports.postUser = async (req, res, next) => {
   try {
     const { username, name, surname, email, role, payment } = req.body;
