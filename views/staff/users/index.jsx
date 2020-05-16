@@ -198,10 +198,10 @@ const UsersStaff = (props) => {
         <DialogContent>
           <form
             action={
-              props.role
-                ? props.role === "admin"
+              props.appUser
+                ? props.appUser.role === "admin"
                   ? "/admin/users"
-                  : props.role === "staff"
+                  : props.appUser.role === "staff"
                   ? "/staff/users"
                   : "/staff/users"
                 : "/staff/users"
@@ -302,7 +302,7 @@ const UsersStaff = (props) => {
       </Dialog>
 
       <div style={{ display: "flex" }}>
-        <AppBar loggedIn={props.loggedIn} user={props.user} />
+        <AppBar loggedIn={props.loggedIn} user={props.appUser} />
       </div>
       <Helmet>
         <title>KAGGLE STAFF | USERS</title>

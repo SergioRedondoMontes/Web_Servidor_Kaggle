@@ -38,7 +38,12 @@ router.post("/login", controllers.admin.login);
 
 router.post("/users", controllers.admin.postUser);
 
-router.get("/users", controllers.admin.getUsers);
+router.get(
+  "/users",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.getUsers
+);
 
 router.get("/employees", controllers.admin.getEmployees);
 
