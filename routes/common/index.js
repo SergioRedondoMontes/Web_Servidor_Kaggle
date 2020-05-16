@@ -21,7 +21,7 @@ router.get("/", (req, res) => {
   const user = res.locals.loggedInUser;
   res.render("common/home", {
     loggedIn: user ? true : false,
-    role: user ? user.role : null,
+    user: user || null,
   });
 });
 
@@ -52,5 +52,9 @@ router.put(
   middleWares.auth.checkLoggedIn,
   controllers.common.updateRanking
 );
+router.get("/signout", (req, res) => {
+  res.clearCookie("authorization-kaggle");
+  res.redirect("/");
+});
 
 module.exports = router;

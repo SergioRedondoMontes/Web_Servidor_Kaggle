@@ -13,9 +13,11 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Alert from "@material-ui/lab/Alert";
-import { AppBar } from "../../../viewsComponents/AppBar";
 
 import { Helmet } from "react-helmet";
+import { DataTables } from "../../../viewsComponents/DataTables";
+import { Chip } from "@material-ui/core";
+import { AppBar } from "../../../viewsComponents/AppBar";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,40 +52,77 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home = (props) => {
+const UsersStaff = (props) => {
   const classes = useStyles();
 
-  const [email, setEmail] = useState(props.email || "");
-
-  const handleAlert = () => {
-    switch (props.alert) {
-      case "email":
-        return <Alert severity="error">Email incorrecto</Alert>;
-      case "password":
-        return <Alert severity="error">Email o contraseña incorrectos</Alert>;
-      default:
-        return null;
-    }
+  const createColumns = () => {
+    return [
+      {
+        name: "_id",
+        label: "id",
+        options: {
+          filter: false,
+          display: false,
+        },
+      },
+      {
+        name: "name",
+        label: "Nombre",
+        options: {
+          filter: true,
+        },
+      },
+      {
+        name: "email",
+        label: "Email",
+        options: {
+          filter: true,
+        },
+      },
+      {
+        name: "role",
+        label: "Rol",
+        options: {
+          filter: true,
+          filterType: "checkbox",
+          customBodyRender: (value, tableMeta, updateValue) => (
+            <Chip label={value} />
+          ),
+        },
+      },
+      {
+        name: "options",
+        label: "",
+        options: {
+          label: false,
+          filter: false,
+          customBodyRender: (value, tableMeta, updateValue) => (
+            <Button
+              variant="contained"
+              color="primary"
+              href={`users/${tableMeta.rowData[0]}`}
+            >
+              Ver
+            </Button>
+          ),
+        },
+      },
+    ];
   };
   return (
-    <Grid container component="main" className={classes.root}>
+    <Grid container component="main" className={classes.root} justify="center">
+      <div style={{ display: "flex" }}>
+        <AppBar loggedIn={props.loggedIn} user={props.user} />
+      </div>
       <Helmet>
-        <title>KAGGLE</title>
+        <title>KAGGLE STAFF</title>
       </Helmet>
-      <AppBar loggedIn={props.loggedIn} user={props.user} />
-      <Grid item xs={12}>
-        {props.loggedIn ? (
-          <Typography variant="h1">
-            Bienvenido usuario {props.user.role}
-          </Typography>
-        ) : (
-          <Button variant="contained" href="/login">
-            Dirigete a iniciar sesión
-          </Button>
-        )}
+
+      <Grid item xs={10}>
+        <DataTables data={props.users} columns={createColumns()} />
       </Grid>
     </Grid>
   );
 };
 
-export default Home;
+export default UsersStaff;

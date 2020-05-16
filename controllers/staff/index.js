@@ -34,9 +34,7 @@ exports.postUser = async (req, res, next) => {
 
 exports.getUsers = async (req, res, next) => {
   const users = await User.find({ role: { $in: ["player", "challenger"] } });
-  res.status(200).json({
-    data: users,
-  });
+  res.render("staff/users", { users });
 };
 
 exports.getUser = async (req, res, next) => {
