@@ -38,10 +38,12 @@ exports.login = async (req, res, next) => {
 exports.getUsers = staffControllers.getUsers;
 
 exports.getEmployees = async (req, res, next) => {
-  const users = await User.find({ role: { $in: ["employee"] } });
-  res.status(200).json({
-    data: users,
-  });
+  try {
+    const employees = await User.find({ role: { $in: ["employee"] } });
+    res.render("admin/employees", { employees });
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.getUser = async (req, res, next) => {

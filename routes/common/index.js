@@ -21,7 +21,7 @@ router.get("/", (req, res) => {
   const user = res.locals.loggedInUser;
   res.render("common/home", {
     loggedIn: user ? true : false,
-    role: user ? user.role : null,
+    user: user || null,
   });
 });
 
@@ -40,5 +40,10 @@ router.post("/challenges", controllers.common.postChallenge);
 router.put("/challenges/:challengeId", controllers.common.updateChallenge);
 
 router.delete("/challenges/:challengeId", controllers.common.deleteChallenge);
+
+router.get("/signout", (req, res) => {
+  res.clearCookie("authorization-kaggle");
+  res.redirect("/");
+});
 
 module.exports = router;

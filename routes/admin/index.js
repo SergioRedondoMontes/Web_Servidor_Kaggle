@@ -38,7 +38,7 @@ router.post("/login", controllers.admin.login);
 
 router.get("/users", controllers.admin.getUsers);
 
-router.get("/employee", controllers.admin.getEmployees);
+router.get("/employees", controllers.admin.getEmployees);
 
 router.get("/users/:userId", controllers.admin.getUser);
 
@@ -55,5 +55,10 @@ router.post("/challenges", controllers.admin.postChallenge);
 router.put("/challenges/:challengeId", controllers.admin.updateChallenge);
 
 router.delete("/challenges/:challengeId", controllers.admin.deleteChallenge);
+
+router.get("/signout", (req, res) => {
+  res.clearCookie("authorization-kaggle");
+  res.redirect("/");
+});
 
 module.exports = router;
