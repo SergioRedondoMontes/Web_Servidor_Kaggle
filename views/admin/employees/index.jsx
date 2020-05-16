@@ -189,7 +189,7 @@ const EmployeesAdmin = (props) => {
                 <Button
                   variant="contained"
                   color="primary"
-                  size="sm"
+                  size="small"
                   onClick={handleDialogAddEmployee}
                 >
                   <PersonAddIcon />

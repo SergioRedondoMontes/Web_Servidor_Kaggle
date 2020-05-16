@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -13,6 +13,8 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Helmet } from "react-helmet";
+import { FormControl, InputLabel, Select, MenuItem } from "@material-ui/core";
+import Alert from "@material-ui/lab/Alert";
 
 function Copyright() {
   return (
@@ -47,9 +49,44 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp() {
+export default function SignUp(props) {
   const classes = useStyles();
+  const [user, setUser] = useState(
+    props.user || {
+      name: "",
+      surname: "",
+      email: "",
+      username: "",
+      role: "",
+      password: "",
+    }
+  );
 
+  const [disabledSubmit, setDisabledSubmit] = useState(true);
+  const handleAlert = () => {
+    switch (props.alert) {
+      case "email-exists":
+        return <Alert severity="error">Email ya existe</Alert>;
+      default:
+        return null;
+    }
+  };
+
+  const handleEditUser = (event) => {
+    const auxUser = { ...user, [event.target.name]: event.target.value };
+    setUser(auxUser);
+    checkDisabledSubmit(auxUser);
+  };
+
+  const checkDisabledSubmit = (auxUser) => {
+    let disabled = false;
+    Object.keys(auxUser).forEach((property) => {
+      if (auxUser[property] === "") {
+        disabled = true;
+      }
+    });
+    setDisabledSubmit(disabled);
+  };
   return (
     <Container component="main" maxWidth="xs">
       <Helmet>
@@ -63,17 +100,22 @@ export default function SignUp() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} action="/signup" method="post">
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              {handleAlert()}
+            </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 autoComplete="fname"
-                name="firstName"
+                name="name"
                 variant="outlined"
                 required
                 fullWidth
-                id="firstName"
-                label="First Name"
+                value={user.name}
+                onChange={handleEditUser}
+                id="name"
+                label="Nombre"
                 autoFocus
               />
             </Grid>
@@ -82,11 +124,50 @@ export default function SignUp() {
                 variant="outlined"
                 required
                 fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
+                id="surname"
+                value={user.surname}
+                onChange={handleEditUser}
+                label="Apellidos"
+                name="surname"
                 autoComplete="lname"
               />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                id="username"
+                value={user.username}
+                onChange={handleEditUser}
+                label="Nombre de usuario"
+                name="username"
+                autoComplete="lname"
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl
+                variant="outlined"
+                className={classes.formControl}
+                fullWidth
+              >
+                <InputLabel id="demo-simple-select-outlined-label">
+                  Rol
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-outlined-label"
+                  id="demo-simple-select-outlined"
+                  name="role"
+                  value={user.role}
+                  required
+                  fullWidth
+                  onChange={handleEditUser}
+                  label="Rol"
+                >
+                  <MenuItem value="player">Player</MenuItem>
+                  <MenuItem value="challenger">Challenger</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -94,7 +175,9 @@ export default function SignUp() {
                 required
                 fullWidth
                 id="email"
-                label="Email Address"
+                value={user.email}
+                onChange={handleEditUser}
+                label="Email"
                 name="email"
                 autoComplete="email"
               />
@@ -105,16 +188,12 @@ export default function SignUp() {
                 required
                 fullWidth
                 name="password"
-                label="Password"
+                value={user.password}
+                onChange={handleEditUser}
+                label="Contraseña"
                 type="password"
                 id="password"
                 autoComplete="current-password"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                label="I want to receive inspiration, marketing promotions and updates via email."
               />
             </Grid>
           </Grid>
@@ -123,14 +202,15 @@ export default function SignUp() {
             fullWidth
             variant="contained"
             color="primary"
+            disabled={disabledSubmit}
             className={classes.submit}
           >
-            Sign Up
+            Crear usuario
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
               <Link href="/login" variant="body2">
-                Already have an account? Sign in
+                ¿Ya tienes usuario? Ve a login
               </Link>
             </Grid>
           </Grid>
