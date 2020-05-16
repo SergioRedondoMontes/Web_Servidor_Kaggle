@@ -42,6 +42,8 @@ router.get("/users", controllers.admin.getUsers);
 
 router.get("/employees", controllers.admin.getEmployees);
 
+router.post("/employees", controllers.admin.postEmployee);
+
 router.get("/users/:userId", controllers.admin.getUser);
 
 router.put("/users/:userId", controllers.admin.updateUser);

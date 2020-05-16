@@ -67,6 +67,38 @@ exports.postUser = async (req, res, next) => {
 
 exports.getUsers = staffControllers.getUsers;
 
+exports.postEmployee = async (req, res, next) => {
+  const { username, name, surname, email } = req.body;
+  try {
+    const hashedPassword = await hashPassword("password");
+    const newUser = new User({
+      username,
+      name,
+      surname,
+      email,
+      password: hashedPassword,
+      role: "employee",
+      resetPassword: false,
+    });
+    const accessToken = jwt.sign(
+      { userId: newUser._id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+    newUser.accessToken = accessToken;
+    await newUser.save();
+    res.redirect("/admin/employees");
+  } catch (error) {
+    res.render("admin/employees", {
+      alert: "email-exists",
+      dialogOpen: true,
+      employee: { username, name, surname, email },
+    });
+  }
+};
+
 exports.getEmployees = async (req, res, next) => {
   try {
     const employees = await User.find({ role: { $in: ["employee"] } });

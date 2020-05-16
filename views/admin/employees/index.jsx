@@ -19,6 +19,7 @@ import { Helmet } from "react-helmet";
 import { DataTables } from "../../../viewsComponents/DataTables";
 import { Chip, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
 import { AppBar } from "../../../viewsComponents/AppBar";
+import FaceIcon from "@material-ui/icons/Face";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -58,7 +59,41 @@ const useStyles = makeStyles((theme) => ({
 
 const EmployeesAdmin = (props) => {
   const classes = useStyles();
-  const [openDialogAddEmployee, setOpenDialogAddEmployee] = useState(false);
+  const [openDialogAddEmployee, setOpenDialogAddEmployee] = useState(
+    props.dialogOpen || false
+  );
+  const [employee, setEmployee] = useState(
+    props.employee || { name: "", surname: "", email: "", username: "" }
+  );
+  const [disabledSubmit, setDisabledSubmit] = useState(true);
+  const handleAlert = () => {
+    switch (props.alert) {
+      case "email-exists":
+        return <Alert severity="error">Email ya existe</Alert>;
+      default:
+        return null;
+    }
+  };
+
+  const handleEditEmployee = (event) => {
+    const auxEmployee = {
+      ...employee,
+      [event.target.name]: event.target.value,
+    };
+    setEmployee(auxEmployee);
+    checkDisabledSubmit(auxEmployee);
+  };
+
+  const checkDisabledSubmit = (auxEmployee) => {
+    let disabled = false;
+    Object.keys(auxEmployee).forEach((property) => {
+      if (auxEmployee[property] === "") {
+        disabled = true;
+      }
+    });
+    setDisabledSubmit(disabled);
+  };
+
   const createColumns = () => {
     return [
       {
@@ -72,6 +107,20 @@ const EmployeesAdmin = (props) => {
       {
         name: "name",
         label: "Nombre",
+        options: {
+          filter: true,
+        },
+      },
+      {
+        name: "surname",
+        label: "Apellidos",
+        options: {
+          filter: true,
+        },
+      },
+      {
+        name: "username",
+        label: "Username",
         options: {
           filter: true,
         },
@@ -117,41 +166,59 @@ const EmployeesAdmin = (props) => {
         maxWidth="md"
         title="Añadir empleado"
       >
-        <DialogTitle>
+        <DialogTitle
+          style={{
+            display: "flex",
+            alignItems: "center",
+            flexFlow: "column",
+            justifyContent: "center",
+          }}
+        >
+          <Typography variant="h6" align="center">
+            <FaceIcon style={{ fontSize: "48px" }} />
+          </Typography>
           <Typography variant="h6" align="center">
             Añadir empleado
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <form action="/employees/add" method="post">
-            <input type="hidden" name="role" value="employee" />
+          <form action="employees" method="post">
             <Grid container spacing={2}>
+              <Grid item xs={12}>
+                {handleAlert()}
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   variant="outlined"
-                  margin="dense"
+                  margin="normal"
                   placeholder="Introduce nombre"
                   label="Nombre"
                   name="name"
+                  value={employee.name}
+                  onChange={handleEditEmployee}
                   fullWidth
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   variant="outlined"
-                  margin="dense"
+                  margin="normal"
                   placeholder="Introduce apellidos"
                   label="Apellidos"
                   name="surname"
+                  value={employee.surname}
+                  onChange={handleEditEmployee}
                   fullWidth
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   variant="outlined"
-                  margin="dense"
+                  margin="normal"
                   placeholder="Introduce nombre de usuario"
                   label="Nombre usuario"
+                  value={employee.username}
+                  onChange={handleEditEmployee}
                   name="username"
                   fullWidth
                 />
@@ -159,12 +226,25 @@ const EmployeesAdmin = (props) => {
               <Grid item xs={12}>
                 <TextField
                   variant="outlined"
-                  margin="dense"
-                  placeholder="xx@xx.com"
+                  margin="normal"
+                  placeholder="email@email.com"
+                  value={employee.email}
+                  onChange={handleEditEmployee}
                   label="Email"
                   name="email"
                   fullWidth
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  disabled={disabledSubmit}
+                  color="primary"
+                  fullWidth
+                  type="submit"
+                >
+                  Crear empleado
+                </Button>
               </Grid>
             </Grid>
           </form>
