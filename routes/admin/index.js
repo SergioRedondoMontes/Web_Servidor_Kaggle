@@ -36,7 +36,12 @@ router.get("/login", (req, res) => {
 
 router.post("/login", controllers.admin.login);
 
-router.post("/users", controllers.admin.postUser);
+router.post(
+  "/users",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.postUser
+);
 
 router.get(
   "/users",
@@ -45,11 +50,26 @@ router.get(
   controllers.admin.getUsers
 );
 
-router.get("/employees", controllers.admin.getEmployees);
+router.get(
+  "/employees",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.getEmployees
+);
 
-router.post("/employees", controllers.admin.postEmployee);
+router.post(
+  "/employees",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.postEmployee
+);
 
-router.get("/users/:userId", controllers.admin.getUser);
+router.get(
+  "/users/:userId",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.getUser
+);
 
 router.put("/users/:userId", controllers.admin.updateUser);
 

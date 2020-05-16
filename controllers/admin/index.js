@@ -65,6 +65,8 @@ exports.postUser = async (req, res, next) => {
       alert: "email-exists",
       dialogOpen: true,
       users: { username, name, surname, email, role },
+      appUser: res.locals.loggedInUser,
+      loggedIn: true,
     });
   }
 };
@@ -99,6 +101,8 @@ exports.postEmployee = async (req, res, next) => {
       alert: "email-exists",
       dialogOpen: true,
       employee: { username, name, surname, email },
+      appUser: res.locals.loggedInUser,
+      loggedIn: true,
     });
   }
 };
@@ -106,7 +110,11 @@ exports.postEmployee = async (req, res, next) => {
 exports.getEmployees = async (req, res, next) => {
   try {
     const employees = await User.find({ role: { $in: ["employee"] } });
-    res.render("admin/employees", { employees });
+    res.render("admin/employees", {
+      employees,
+      appUser: res.locals.loggedInUser,
+      loggedIn: true,
+    });
   } catch (error) {
     next(error);
   }

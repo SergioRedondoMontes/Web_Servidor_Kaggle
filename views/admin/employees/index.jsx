@@ -256,7 +256,7 @@ const EmployeesAdmin = (props) => {
         <title>KAGGLE STAFF | EMPLOYEES</title>
       </Helmet>
       <div style={{ display: "flex" }}>
-        <AppBar loggedIn={props.loggedIn} user={props.user} />
+        <AppBar loggedIn={props.loggedIn} user={props.appUser} />
       </div>
       <Grid item xs={1} />
       <Grid item xs={10}>

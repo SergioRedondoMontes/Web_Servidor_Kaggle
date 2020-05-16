@@ -16,7 +16,7 @@ router.get(
     }
   },
   middleWares.auth.checkLoggedIn,
-  middleWares.auth.checkAuthAdmin,
+  middleWares.auth.checkAuthStaff,
   (req, res) => {
     res.redirect("/staff/home");
   }
@@ -25,7 +25,7 @@ router.get(
 router.get(
   "/home",
   middleWares.auth.checkLoggedIn,
-  middleWares.auth.checkAuthAdmin,
+  middleWares.auth.checkAuthStaff,
   (req, res) => {
     res.send("esto funciona porque estas logged in");
   }
@@ -36,11 +36,26 @@ router.get("/login", (req, res) => {
 
 // router.post("/login", controllers.staff.login);
 
-router.get("/users", controllers.staff.getUsers);
+router.get(
+  "/users",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
+  controllers.staff.getUsers
+);
 
-router.post("/users", controllers.staff.postUser);
+router.post(
+  "/users",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
+  controllers.staff.postUser
+);
 
-router.get("/users/:userId", controllers.staff.getUser);
+router.get(
+  "/users/:userId",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
+  controllers.staff.getUser
+);
 
 router.put("/users/:userId", controllers.staff.updateUser);
 
