@@ -4,9 +4,17 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { roles } = require("../../roles");
 
+async function hashPassword(password) {
+  return await bcrypt.hash(password, 10);
+}
+
+async function validatePassword(plainPassword, hashedPassword) {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+}
+
 exports.postUser = async (req, res, next) => {
+  const { username, name, surname, email, role, payment } = req.body;
   try {
-    const { username, name, surname, email, role, payment } = req.body;
     const hashedPassword = await hashPassword("password");
     const newUser = new User({
       username,
@@ -27,8 +35,13 @@ exports.postUser = async (req, res, next) => {
     );
     newUser.accessToken = accessToken;
     await newUser.save();
+    res.redirect("/staff/users");
   } catch (error) {
-    next(error);
+    res.render("staff/users", {
+      alert: "email-exists",
+      dialogOpen: true,
+      user: { username, name, surname, email, role },
+    });
   }
 };
 

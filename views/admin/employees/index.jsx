@@ -140,13 +140,15 @@ const EmployeesAdmin = (props) => {
           label: false,
           filter: false,
           customBodyRender: (value, tableMeta, updateValue) => (
-            <Button
-              variant="contained"
-              color="primary"
-              href={`users/${tableMeta.rowData[0]}`}
-            >
-              Ver
-            </Button>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                variant="contained"
+                color="primary"
+                href={`users/${tableMeta.rowData[0]}`}
+              >
+                Ver
+              </Button>
+            </div>
           ),
         },
       },

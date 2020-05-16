@@ -38,3 +38,15 @@ exports.checkAuthAdmin = function (req, res, next) {
     res.redirect("/");
   }
 };
+
+exports.checkAuthStaff = function (req, res, next) {
+  if (req.user) {
+    if (req.user.role === "staff") {
+      next();
+    } else {
+      res.redirect("/");
+    }
+  } else {
+    res.redirect("/");
+  }
+};

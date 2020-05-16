@@ -61,7 +61,11 @@ exports.postUser = async (req, res, next) => {
     await newUser.save();
     res.redirect("/admin/users");
   } catch (error) {
-    next(error);
+    res.render("admin/users", {
+      alert: "email-exists",
+      dialogOpen: true,
+      users: { username, name, surname, email, role },
+    });
   }
 };
 
