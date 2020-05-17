@@ -7,15 +7,18 @@ const fs = require("fs");
 
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const base = "./public/uploads/";
-    var id = "hola";
-    var url = base + id;
-    fs.mkdir(url, (error) => {
-      cb(null, url);
+    const path = `./public/tmp`;
+    fs.mkdir(path, (error) => {
+      cb(null, path);
     });
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    cb(
+      null,
+      new Date().getTime() +
+        "." +
+        file.originalname.split(".")[file.originalname.split(".").length - 1]
+    );
   },
 });
 
@@ -53,7 +56,12 @@ router.get("/challenges", controllers.common.getChallenges);
 
 router.get("/challenges/:challengeId", controllers.common.getChallenge);
 
-router.post("/challenges", controllers.common.postChallenge);
+router.post(
+  "/challenges",
+  middleWares.auth.checkLoggedIn,
+  upload.fields([{ name: "competition" }, { name: "test_competition" }]),
+  controllers.common.postChallenge
+);
 
 router.put("/challenges/:challengeId", controllers.common.updateChallenge);
 
@@ -75,10 +83,13 @@ router.get("/signout", (req, res) => {
   res.redirect("/");
 });
 
-router.post(
-  "/testUpload",
-  upload.single("uploaded_file"),
-  controllers.common.testUpload
-);
+// router.post(
+//   "/testUpload",
+//   upload.fields([{ name: "uploaded_file" }, { name: "uploaded_file2" }]),
+//   controllers.common.testUpload,
+//   (req, res) => {
+//     res.send("guardado");
+//   }
+// );
 
 module.exports = router;

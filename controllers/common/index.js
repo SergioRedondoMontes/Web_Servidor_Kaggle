@@ -3,6 +3,7 @@ const Challenge = require("../../models/challengeModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { roles } = require("../../roles");
+const fs = require("fs");
 
 async function hashPassword(password) {
   return await bcrypt.hash(password, 10);
@@ -117,7 +118,10 @@ exports.deleteUser = async (req, res, next) => {
 };
 
 exports.postChallenge = async (req, res, next) => {
+  console.log(req.body);
+  //   res.send(req.files);
   try {
+    // console.log("body ,", JSON.parse(req));
     const { title, description } = req.body;
     const newChallenge = new Challenge({
       title,
@@ -125,14 +129,41 @@ exports.postChallenge = async (req, res, next) => {
       owner: req.user._id,
       participant: [],
       ranking: [],
-      url_files: ["url1", "url2"],
+      url_files: [],
     });
     await newChallenge.save();
-    res.json({
-      data: newChallenge,
+    const challengeId = newChallenge._id;
+    fs.mkdirSync(`./public/challenges/${challengeId}/`);
+    const paths = [];
+    Object.keys(req.files).forEach((file, index) => {
+      const path = `./public/challenges/${challengeId}/${
+        req.files[file][0].path.split("/")[
+          req.files[file][0].path.split("/").length - 1
+        ]
+      }`;
+      fs.renameSync(`./${req.files[file][0].path}`, path);
+
+      paths.push(path);
     });
+
+    await Challenge.findByIdAndUpdate(
+      challengeId,
+      { url_files: paths },
+      function (err, updatedChallenge) {
+        if (err) throw err;
+        const challenge = updatedChallenge;
+        res.status(200).json({
+          data: challenge,
+          message: "Challenge has been updated",
+        });
+      }
+    );
+
+    // res.send("gola");
   } catch (error) {
-    next(error);
+    res.send(error);
+    // res.send("que lo que");
+    return;
   }
 };
 
@@ -243,8 +274,4 @@ exports.deleteChallenge = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-exports.testUpload = async (req, res, next) => {
-  console.log(req.file, req.body);
-  res.send("guardao");
 };
