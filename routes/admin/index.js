@@ -71,37 +71,75 @@ router.get(
   controllers.admin.getUser
 );
 
-router.put("/users/:userId", controllers.admin.updateUser);
+router.put(
+  "/users/:userId",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.updateUser
+);
 
-router.put("/users/:userId/resetPassword", controllers.admin.resetPassword);
+router.put(
+  "/users/:userId/resetPassword",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.resetPassword
+);
 
-router.delete("/users/:userId", controllers.admin.deleteUser);
+router.delete(
+  "/users/:userId",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.deleteUser
+);
 
-router.get("/challenges", controllers.admin.getChallenges);
+router.get(
+  "/challenges",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.getChallenges
+);
 
-router.get("/challenges/:challengeId", controllers.admin.getChallenge);
+router.get(
+  "/challenges/:challengeId",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.getChallenge
+);
 
 router.post(
   "/challenges",
   middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
   controllers.admin.postChallenge
 );
 
-router.put("/challenges/:challengeId", controllers.admin.updateChallenge);
+router.put(
+  "/challenges/:challengeId",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.updateChallenge
+);
 
 router.put(
   "/challenges/:challengeId/participants",
   middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
   controllers.admin.updateParticipants
 );
 
 router.put(
   "/challenges/:challengeId/ranking",
   middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
   controllers.admin.updateRanking
 );
 
-router.delete("/challenges/:challengeId", controllers.admin.deleteChallenge);
+router.delete(
+  "/challenges/:challengeId",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthAdmin,
+  controllers.admin.deleteChallenge
+);
 
 router.get("/signout", (req, res) => {
   res.clearCookie("authorization-kaggle");

@@ -149,8 +149,10 @@ exports.postChallenge = async (req, res, next) => {
 
 exports.getChallenges = async (req, res, next) => {
   const challenges = await Challenge.find({});
-  res.status(200).json({
-    data: challenges,
+  res.render("staff/challenges", {
+    challenges,
+    appUser: res.locals.loggedInUser || null,
+    loggedIn: true,
   });
 };
 
@@ -184,27 +186,35 @@ exports.updateChallenge = async (req, res, next) => {
 
 exports.updateParticipants = async (req, res, next) => {
   try {
-    const update = req.body;
     const challengeId = req.params.challengeId;
-    await Challenge.findByIdAndUpdate(
-      challengeId,
-      {
-        $addToSet: {
-          participant: {
-            userId: req.user._id,
-            username: req.user.username,
+    const participant = await Challenge.find({
+      "participant.userId": req.user._id,
+    });
+    // console.log("participant", participant);
+    if (participant.length === 0) {
+      await Challenge.findByIdAndUpdate(
+        challengeId,
+        {
+          $addToSet: {
+            participant: {
+              userId: req.user._id,
+              username: req.user.username,
+              date: new Date(),
+            },
           },
         },
-      },
-      function (err, updatedChallenge) {
-        if (err) throw err;
-        const challenge = updatedChallenge;
-        res.status(200).json({
-          data: challenge,
-          message: "Challenge has been updated",
-        });
-      }
-    );
+        function (err, updatedChallenge) {
+          if (err) throw err;
+          const challenge = updatedChallenge;
+          res.status(200).json({
+            data: challenge,
+            message: "Challenge has been updated",
+          });
+        }
+      );
+    } else {
+      res.send("ya existe");
+    }
   } catch (error) {
     next(error);
   }

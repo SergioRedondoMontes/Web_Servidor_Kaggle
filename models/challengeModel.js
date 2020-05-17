@@ -24,6 +24,9 @@ const ChallengeSchema = new Schema(
         username: {
           type: String,
         },
+        date: {
+          type: Date,
+        },
         _id: false,
       },
     ],

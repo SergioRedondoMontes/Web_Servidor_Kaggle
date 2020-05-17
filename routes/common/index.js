@@ -44,7 +44,7 @@ router.delete("/challenges/:challengeId", controllers.common.deleteChallenge);
 router.put(
   "/challenges/:challengeId/participants",
   middleWares.auth.checkLoggedIn,
-  controllers.common.updateParticipats
+  controllers.common.updateParticipants
 );
 
 router.put(
