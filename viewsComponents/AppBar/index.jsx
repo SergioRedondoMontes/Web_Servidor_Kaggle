@@ -135,7 +135,7 @@ const AppBar = (props) => {
       case "player":
       case "challenger":
         return "/";
-      case "staff":
+      case "employee":
         return "/staff";
       case "admin":
         return "/admin";
@@ -157,12 +157,15 @@ const AppBar = (props) => {
           </Typography>
           {props.loggedIn ? (
             <div>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <Typography
-                  variant="caption"
-                  onClick={handleMenu}
-                  style={{ cursor: "pointer" }}
-                >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
+                onClick={handleMenu}
+              >
+                <Typography variant="caption">
                   {props.user ? props.user.name || props.user.role : "user"}
                 </Typography>
                 <ArrowDropDownIcon />
