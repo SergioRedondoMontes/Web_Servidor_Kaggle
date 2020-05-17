@@ -244,3 +244,7 @@ exports.deleteChallenge = async (req, res, next) => {
     next(error);
   }
 };
+exports.testUpload = async (req, res, next) => {
+  console.log(req.file, req.body);
+  res.send("guardao");
+};

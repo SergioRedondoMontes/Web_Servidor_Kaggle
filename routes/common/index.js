@@ -2,6 +2,24 @@ const express = require("express");
 const router = express.Router();
 const middleWares = require("../../middlewares");
 const controllers = require("../../controllers");
+var multer = require("multer");
+const fs = require("fs");
+
+var storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const base = "./public/uploads/";
+    var id = "hola";
+    var url = base + id;
+    fs.mkdir(url, (error) => {
+      cb(null, url);
+    });
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+var upload = multer({ storage: storage });
 
 // AUTH
 router.get("/signup", (req, res) => {
@@ -56,5 +74,11 @@ router.get("/signout", (req, res) => {
   res.clearCookie("authorization-kaggle");
   res.redirect("/");
 });
+
+router.post(
+  "/testUpload",
+  upload.single("uploaded_file"),
+  controllers.common.testUpload
+);
 
 module.exports = router;
