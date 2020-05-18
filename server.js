@@ -29,24 +29,9 @@ const app = express();
 
   app.use(async (req, res, next) => {
     // CHECK EXISTS ACCESS TOKEN IN HEADERS
-    if (req.headers["x-access-token"]) {
-      const accessToken = req.headers["x-access-token"];
-      const { userId, exp } = await jwt.verify(
-        accessToken,
-        process.env.JWT_SECRET
-      );
-      // Check if token has expired
-      if (exp < Date.now().valueOf() / 1000) {
-        return res.status(401).json({
-          error: "JWT token has expired, please login to obtain a new one",
-        });
-      }
-      res.locals.loggedInUser = await User.findById(userId);
-      next();
-    } else {
-      // CHECK EXISTS ACCESS TOKEN IN COOKIE
-      if (req.cookies["authorization-kaggle"]) {
-        const accessToken = req.cookies["authorization-kaggle"];
+    try {
+      if (req.headers["x-access-token"]) {
+        const accessToken = req.headers["x-access-token"];
         const { userId, exp } = await jwt.verify(
           accessToken,
           process.env.JWT_SECRET
@@ -60,8 +45,27 @@ const app = express();
         res.locals.loggedInUser = await User.findById(userId);
         next();
       } else {
-        next();
+        // CHECK EXISTS ACCESS TOKEN IN COOKIE
+        if (req.cookies["authorization-kaggle"]) {
+          const accessToken = req.cookies["authorization-kaggle"];
+          const { userId, exp } = await jwt.verify(
+            accessToken,
+            process.env.JWT_SECRET
+          );
+          // Check if token has expired
+          if (exp < Date.now().valueOf() / 1000) {
+            return res.status(401).json({
+              error: "JWT token has expired, please login to obtain a new one",
+            });
+          }
+          res.locals.loggedInUser = await User.findById(userId);
+          next();
+        } else {
+          next();
+        }
       }
+    } catch (err) {
+      res.send("ho ");
     }
   });
 

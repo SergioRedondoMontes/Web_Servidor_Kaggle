@@ -86,10 +86,16 @@ router.get("/challenges/:challengeId", controllers.staff.getChallenge);
 router.post(
   "/challenges",
   middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
   controllers.staff.postChallenge
 );
 
-router.put("/challenges/:challengeId", controllers.staff.updateChallenge);
+router.post(
+  "/challenges/:challengeId",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
+  controllers.staff.updateChallenge
+);
 
 router.delete("/challenges/:challengeId", controllers.staff.deleteChallenge);
 

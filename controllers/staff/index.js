@@ -161,9 +161,7 @@ exports.getChallenge = async (req, res, next) => {
     const challengeId = req.params.challengeId;
     const challenge = await Challenge.findById(challengeId);
     if (!challenge) return next(new Error("User does not exist"));
-    res.status(200).json({
-      data: challenge,
-    });
+    res.render("staff/challenge", { challenge });
   } catch (error) {
     next(error);
   }
@@ -175,10 +173,7 @@ exports.updateChallenge = async (req, res, next) => {
     const challengeId = req.params.challengeId;
     await Challenge.findByIdAndUpdate(challengeId, update);
     const challenge = await Challenge.findById(challengeId);
-    res.status(200).json({
-      data: challenge,
-      message: "Challenge has been updated",
-    });
+    res.redirect(`/staff/challenges/${challenge._id.toString()}`);
   } catch (error) {
     next(error);
   }
