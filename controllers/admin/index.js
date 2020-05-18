@@ -162,10 +162,7 @@ exports.deleteUser = async (req, res, next) => {
   try {
     const userId = req.params.userId;
     await User.findByIdAndDelete(userId);
-    res.status(200).json({
-      data: null,
-      message: "User has been deleted",
-    });
+    res.redirect("/admin/users");
   } catch (error) {
     next(error);
   }

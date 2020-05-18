@@ -33,6 +33,7 @@ import {
 } from "@material-ui/core";
 import { AppBar } from "../../../viewsComponents/AppBar";
 
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import FaceIcon from "@material-ui/icons/Face";
 import EditIcon from "@material-ui/icons/Edit";
 
@@ -282,10 +283,32 @@ const UserStaff = (props) => {
                 props.appUser.role === "admin" ? (
                   <Button
                     variant="contained"
-                    style={{ background: "yellow" }}
+                    style={{ background: "yellow", marginRight: "16px" }}
                     onClick={handleDialogEditUser}
                   >
                     <EditIcon />
+                  </Button>
+                ) : null}
+                {(props.appUser.role === "employee" &&
+                  props.user.role !== "employee" &&
+                  props.user.role !== "admin") ||
+                (props.appUser.role === "employee" &&
+                  props.appUser._id.toString() == props.user._id.toString()) ||
+                props.appUser.role === "admin" ? (
+                  <Button
+                    variant="contained"
+                    style={{ background: "red" }}
+                    href={
+                      props.appUser
+                        ? props.appUser.role === "admin"
+                          ? `/admin/users/${props.user._id.toString()}/delete`
+                          : props.appUser.role === "employee"
+                          ? `/staff/users/${props.user._id.toString()}/delete`
+                          : `/staff/users/${props.user._id.toString()}/delete`
+                        : `/staff/users/${props.user._id.toString()}/delete`
+                    }
+                  >
+                    <HighlightOffIcon />
                   </Button>
                 ) : null}
               </div>

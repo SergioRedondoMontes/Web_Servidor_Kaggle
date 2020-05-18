@@ -84,7 +84,12 @@ router.get(
   controllers.staff.resetPassword
 );
 
-router.delete("/users/:userId", controllers.staff.deleteUser);
+router.get(
+  "/users/:userId/delete",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
+  controllers.staff.deleteUser
+);
 
 // END USER ROUTES
 
