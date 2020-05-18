@@ -89,9 +89,19 @@ router.delete("/users/:userId", controllers.staff.deleteUser);
 // END USER ROUTES
 
 // CHALLENGER ROUTES
-router.get("/challenges", controllers.staff.getChallenges);
+router.get(
+  "/challenges",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
+  controllers.staff.getChallenges
+);
 
-router.get("/challenges/:challengeId", controllers.staff.getChallenge);
+router.get(
+  "/challenges/:challengeId",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
+  controllers.staff.getChallenge
+);
 
 router.post(
   "/challenges",
