@@ -83,6 +83,8 @@ router.get("/signout", (req, res) => {
   res.redirect("/");
 });
 
+router.get("/uploadPredictions", controllers.common.uploadPredictions);
+
 // router.post(
 //   "/testUpload",
 //   upload.fields([{ name: "uploaded_file" }, { name: "uploaded_file2" }]),

@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { roles } = require("../../roles");
 const fs = require("fs");
+const DataFrame = require("dataframe-js").DataFrame;
 
 async function hashPassword(password) {
   return await bcrypt.hash(password, 10);
@@ -279,6 +280,35 @@ exports.deleteChallenge = async (req, res, next) => {
     res.status(200).json({
       data: null,
       message: "Challenge has been deleted",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.uploadPredictions = async (req, res, next) => {
+  try {
+    DataFrame.fromCSV(
+      "/Users/sergioredondo/Desktop/UTAD/U-TAD_Alumno/3_Tercero/WebServidor/trabajo_final/Web_Servidor_Kaggle/public/challenges/challenge_prueba_profe/dev.csv"
+    ).then((df) => {
+      const baseValues = df.select("pred").toArray();
+      let count;
+
+      df.withColumn("pred", (row, j) => {
+        if (baseValues[j][0] < 0.5) {
+          return 0;
+        } else {
+          return 1;
+        }
+      });
+
+      let modifyValues = df.select("real").toArray();
+
+      for (let index = 0; index < baseValues.length; index++) {
+        if ((baseValues[index] = modifyValues[index])) count++;
+      }
+
+      res.send(count / baseValues.length);
     });
   } catch (error) {
     next(error);
