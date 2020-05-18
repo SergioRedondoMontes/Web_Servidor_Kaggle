@@ -77,8 +77,10 @@ exports.getUser = async (req, res, next) => {
     const userId = req.params.userId;
     const user = await User.findById(userId);
     if (!user) return next(new Error("User does not exist"));
-    res.status(200).json({
-      data: user,
+    res.render("staff/user", {
+      user,
+      appUser: res.locals.loggedInUser,
+      loggedIn: true,
     });
   } catch (error) {
     next(error);
@@ -91,24 +93,17 @@ exports.updateUser = async (req, res, next) => {
     const userId = req.params.userId;
     await User.findByIdAndUpdate(userId, update);
     const user = await User.findById(userId);
-    res.status(200).json({
-      data: user,
-      message: "User has been updated",
-    });
+    res.redirect(`/staff/users/${user._id.toString()}`);
   } catch (error) {
     next(error);
   }
 };
 exports.resetPassword = async (req, res, next) => {
   try {
-    const update = req.body;
     const userId = req.params.userId;
-    await User.findByIdAndUpdate(userId, update);
+    await User.findByIdAndUpdate(userId, { resetPassword: true });
     const user = await User.findById(userId);
-    res.status(200).json({
-      data: user,
-      message: "User has been updated",
-    });
+    res.redirect(`/staff/users/${user._id.toString()}`);
   } catch (error) {
     next(error);
   }
@@ -161,7 +156,11 @@ exports.getChallenge = async (req, res, next) => {
     const challengeId = req.params.challengeId;
     const challenge = await Challenge.findById(challengeId);
     if (!challenge) return next(new Error("User does not exist"));
-    res.render("staff/challenge", { challenge });
+    res.render("staff/challenge", {
+      challenge,
+      appUser: res.locals.loggedInUser,
+      loggedIn: true,
+    });
   } catch (error) {
     next(error);
   }

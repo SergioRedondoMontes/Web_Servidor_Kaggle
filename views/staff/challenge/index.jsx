@@ -261,10 +261,10 @@ const ChallengeStaff = (props) => {
         <DialogContent>
           <form
             action={
-              props.appChallenge
-                ? props.appChallenge.role === "admin"
+              props.appUser
+                ? props.appUser.role === "admin"
                   ? `/admin/challenges/${props.challenge._id.toString()}`
-                  : props.appChallenge.role === "staff"
+                  : props.appUser.role === "staff"
                   ? `/staff/challenges/${props.challenge._id.toString()}`
                   : `/staff/challenges/${props.challenge._id.toString()}`
                 : `/staff/challenges/${props.challenge._id.toString()}`

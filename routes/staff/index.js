@@ -70,9 +70,19 @@ router.get(
   controllers.staff.getUser
 );
 
-router.put("/users/:userId", controllers.staff.updateUser);
+router.post(
+  "/users/:userId",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
+  controllers.staff.updateUser
+);
 
-router.put("/users/:userId/resetPassword", controllers.staff.resetPassword);
+router.get(
+  "/users/:userId/resetPassword",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
+  controllers.staff.resetPassword
+);
 
 router.delete("/users/:userId", controllers.staff.deleteUser);
 
