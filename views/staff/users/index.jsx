@@ -201,7 +201,7 @@ const UsersStaff = (props) => {
               props.appUser
                 ? props.appUser.role === "admin"
                   ? "/admin/users"
-                  : props.appUser.role === "staff"
+                  : props.appUser.role === "employee"
                   ? "/staff/users"
                   : "/staff/users"
                 : "/staff/users"

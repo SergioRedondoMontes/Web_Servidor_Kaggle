@@ -264,7 +264,7 @@ const ChallengeStaff = (props) => {
               props.appUser
                 ? props.appUser.role === "admin"
                   ? `/admin/challenges/${props.challenge._id.toString()}`
-                  : props.appUser.role === "staff"
+                  : props.appUser.role === "employee"
                   ? `/staff/challenges/${props.challenge._id.toString()}`
                   : `/staff/challenges/${props.challenge._id.toString()}`
                 : `/staff/challenges/${props.challenge._id.toString()}`

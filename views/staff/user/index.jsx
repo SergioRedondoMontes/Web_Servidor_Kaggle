@@ -104,6 +104,9 @@ const UserStaff = (props) => {
     setOpenDialogEditUser(!openDialogEditUser);
   };
 
+  console.log(props.appUser._id.toString());
+  console.log(props.user._id.toString());
+
   return (
     <Grid container component="main" className={classes.root}>
       <Dialog
@@ -133,7 +136,7 @@ const UserStaff = (props) => {
               props.appUser
                 ? props.appUser.role === "admin"
                   ? `/admin/users/${props.user._id.toString()}`
-                  : props.appUser.role === "staff"
+                  : props.appUser.role === "employee"
                   ? `/staff/users/${props.user._id.toString()}`
                   : `/staff/users/${props.user._id.toString()}`
                 : `/staff/users/${props.user._id.toString()}`
@@ -245,32 +248,46 @@ const UserStaff = (props) => {
                 <Typography variant="h4" style={{ flex: "1" }}>
                   {props.user.name + " " + props.user.surname}
                 </Typography>
-                <Button
-                  style={{ marginRight: "16px" }}
-                  disabled={props.user.resetPassword}
-                  variant="contained"
-                  color="primary"
-                  href={
-                    props.appUser
-                      ? props.appUser.role === "admin"
-                        ? `/admin/users/${props.user._id.toString()}/resetPassword`
-                        : props.appUser.role === "staff"
-                        ? `/staff/users/${props.user._id.toString()}/resetPassword`
+                {(props.appUser.role === "employee" &&
+                  props.user.role !== "employee" &&
+                  props.user.role !== "admin") ||
+                (props.appUser.role === "employee" &&
+                  props.appUser._id.toString() == props.user._id.toString()) ||
+                props.appUser.role === "admin" ? (
+                  <Button
+                    style={{ marginRight: "16px" }}
+                    disabled={props.user.resetPassword}
+                    variant="contained"
+                    color="primary"
+                    href={
+                      props.appUser
+                        ? props.appUser.role === "admin"
+                          ? `/admin/users/${props.user._id.toString()}/resetPassword`
+                          : props.appUser.role === "employee"
+                          ? `/staff/users/${props.user._id.toString()}/resetPassword`
+                          : `/staff/users/${props.user._id.toString()}/resetPassword`
                         : `/staff/users/${props.user._id.toString()}/resetPassword`
-                      : `/staff/users/${props.user._id.toString()}/resetPassword`
-                  }
-                >
-                  {props.user.resetPassword
-                    ? "Contraseña reseteada"
-                    : "Resetear contraseña"}
-                </Button>
-                <Button
-                  variant="contained"
-                  style={{ background: "yellow" }}
-                  onClick={handleDialogEditUser}
-                >
-                  <EditIcon />
-                </Button>
+                    }
+                  >
+                    {props.user.resetPassword
+                      ? "Contraseña reseteada"
+                      : "Resetear contraseña"}
+                  </Button>
+                ) : null}
+                {(props.appUser.role === "employee" &&
+                  props.user.role !== "employee" &&
+                  props.user.role !== "admin") ||
+                (props.appUser.role === "employee" &&
+                  props.appUser._id.toString() == props.user._id.toString()) ||
+                props.appUser.role === "admin" ? (
+                  <Button
+                    variant="contained"
+                    style={{ background: "yellow" }}
+                    onClick={handleDialogEditUser}
+                  >
+                    <EditIcon />
+                  </Button>
+                ) : null}
               </div>
               <Divider style={{ margin: "12px 0" }} />
               <Typography variant="body1">
