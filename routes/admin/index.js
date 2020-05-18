@@ -71,14 +71,14 @@ router.get(
   controllers.admin.getUser
 );
 
-router.put(
+router.post(
   "/users/:userId",
   middleWares.auth.checkLoggedIn,
   middleWares.auth.checkAuthAdmin,
   controllers.admin.updateUser
 );
 
-router.put(
+router.get(
   "/users/:userId/resetPassword",
   middleWares.auth.checkLoggedIn,
   middleWares.auth.checkAuthAdmin,
@@ -113,7 +113,7 @@ router.post(
   controllers.admin.postChallenge
 );
 
-router.put(
+router.post(
   "/challenges/:challengeId",
   middleWares.auth.checkLoggedIn,
   middleWares.auth.checkAuthAdmin,
