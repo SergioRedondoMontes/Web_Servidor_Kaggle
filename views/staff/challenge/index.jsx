@@ -17,6 +17,7 @@ import moment from "moment";
 
 import { Helmet } from "react-helmet";
 import { DataTables } from "../../../viewsComponents/DataTables";
+import { DatePicker } from "../../../viewsComponents/DatePicker";
 import {
   Chip,
   Dialog,
@@ -70,22 +71,31 @@ const ChallengeStaff = (props) => {
     props.dialogOpen || false
   );
   const [challenge, setChallenge] = useState(
-    props.challenge || {
-      name: "",
-      surname: "",
-      email: "",
-      challengename: "",
-      role: "",
-    }
+    props.challenge
+      ? {
+          ...props.challenge,
+          dateStart: moment(props.challenge.dateStart),
+          dateEnd: moment(props.challenge.dateEnd),
+        }
+      : {
+          name: "",
+          surname: "",
+          email: "",
+          challengename: "",
+          role: "",
+          dateStart: null,
+          dateEnd: null,
+        }
   );
   const [disabledSubmit, setDisabledSubmit] = useState(true);
-  const handleAlert = () => {
-    switch (props.alert) {
-      case "email-exists":
-        return <Alert severity="error">Email ya existe</Alert>;
-      default:
-        return null;
-    }
+
+  const handleEditDateChallenge = (date, field) => {
+    const auxChallenge = {
+      ...challenge,
+      [field]: date,
+    };
+    setChallenge(auxChallenge);
+    checkDisabledSubmit(auxChallenge);
   };
 
   const handleEditChallenge = (event) => {
@@ -272,9 +282,18 @@ const ChallengeStaff = (props) => {
             method="post"
           >
             <Grid container spacing={2}>
-              <Grid item xs={12}>
-                {handleAlert()}
-              </Grid>
+              <input
+                type="hidden"
+                name="dateStart"
+                value={
+                  challenge.dateStart ? challenge.dateStart.toString() : ""
+                }
+              />
+              <input
+                type="hidden"
+                name="dateEnd"
+                value={challenge.dateEnd ? challenge.dateEnd.toString() : ""}
+              />
               <Grid item xs={12}>
                 <TextField
                   variant="outlined"
@@ -299,6 +318,39 @@ const ChallengeStaff = (props) => {
                   value={challenge.description}
                   onChange={handleEditChallenge}
                   fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <DatePicker
+                  date={challenge.dateStart}
+                  variant="dialog"
+                  format="DD/MM/YYYY"
+                  onChangeDate={(date) =>
+                    handleEditDateChallenge(date, "dateStart")
+                  }
+                  required={props.required}
+                  label="Fecha inicio"
+                  name="dateStart"
+                  style={{ width: "100%" }}
+                  okLabel="Aceptar"
+                  cancelLabel="Cancelar"
+                  invalidDateMessage="Fecha incorrecta"
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <DatePicker
+                  date={challenge.dateEnd}
+                  variant="dialog"
+                  format="DD/MM/YYYY"
+                  label="Fecha fin"
+                  onChangeDate={(date) =>
+                    handleEditDateChallenge(date, "dateEnd")
+                  }
+                  required={props.required}
+                  style={{ width: "100%" }}
+                  okLabel="Aceptar"
+                  cancelLabel="Cancelar"
+                  invalidDateMessage="Fecha incorrecta"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -330,7 +382,18 @@ const ChallengeStaff = (props) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Breadcrumbs aria-label="breadcrumb">
-                <Link color="inherit" href="/staff/challenges">
+                <Link
+                  color="inherit"
+                  href={
+                    props.appUser
+                      ? props.appUser.role === "admin"
+                        ? `/admin/challenges`
+                        : props.appUser.role === "employee"
+                        ? `/staff/challenges`
+                        : `/staff/challenges`
+                      : `/staff/challenges`
+                  }
+                >
                   Competiciones
                 </Link>
                 <Typography variant="body1">

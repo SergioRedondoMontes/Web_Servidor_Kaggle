@@ -2,6 +2,27 @@ const express = require("express");
 const router = express.Router();
 const middleWares = require("../../middlewares");
 const controllers = require("../../controllers");
+var multer = require("multer");
+const fs = require("fs");
+
+var storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const path = `./public/tmp`;
+    fs.mkdir(path, (error) => {
+      cb(null, path);
+    });
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      new Date().getTime() +
+        "." +
+        file.originalname.split(".")[file.originalname.split(".").length - 1]
+    );
+  },
+});
+
+var upload = multer({ storage: storage });
 
 router.get(
   "/",
@@ -109,7 +130,7 @@ router.get(
 router.post(
   "/challenges",
   middleWares.auth.checkLoggedIn,
-  middleWares.auth.checkAuthAdmin,
+  upload.fields([{ name: "competition" }, { name: "test_competition" }]),
   controllers.admin.postChallenge
 );
 

@@ -3,6 +3,7 @@ const Challenge = require("../../models/challengeModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { roles } = require("../../roles");
+const fs = require("fs");
 
 async function hashPassword(password) {
   return await bcrypt.hash(password, 10);
@@ -121,19 +122,41 @@ exports.deleteUser = async (req, res, next) => {
 
 exports.postChallenge = async (req, res, next) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, dateStart, dateEnd } = req.body;
     const newChallenge = new Challenge({
       title,
       description,
       owner: req.user._id,
       participant: [],
       ranking: [],
+      dateStart: dateStart,
+      dateEnd: dateEnd,
       url_files: ["url1", "url2"],
     });
     await newChallenge.save();
-    res.json({
-      data: newChallenge,
+    const challengeId = newChallenge._id;
+    fs.mkdirSync(`./public/challenges/${challengeId}/`);
+    const paths = [];
+    Object.keys(req.files).forEach((file, index) => {
+      const path = `./public/challenges/${challengeId}/${
+        req.files[file][0].path.split("/")[
+          req.files[file][0].path.split("/").length - 1
+        ]
+      }`;
+      fs.renameSync(`./${req.files[file][0].path}`, path);
+
+      paths.push(path);
     });
+
+    await Challenge.findByIdAndUpdate(
+      challengeId,
+      { url_files: paths },
+      function (err, updatedChallenge) {
+        if (err) throw err;
+        const challenge = updatedChallenge;
+        res.redirect(`/staff/challenges/${challengeId}`);
+      }
+    );
   } catch (error) {
     next(error);
   }

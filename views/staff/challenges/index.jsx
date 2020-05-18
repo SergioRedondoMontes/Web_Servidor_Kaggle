@@ -27,6 +27,9 @@ import {
   MenuItem,
 } from "@material-ui/core";
 import { AppBar } from "../../../viewsComponents/AppBar";
+import { DatePicker } from "../../../viewsComponents/DatePicker";
+
+import moment from "moment";
 
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import FaceIcon from "@material-ui/icons/Face";
@@ -66,11 +69,10 @@ const ChallengesStaff = (props) => {
   );
   const [challenge, setChallenge] = useState(
     props.challenge || {
-      name: "",
-      surname: "",
-      email: "",
-      challengename: "",
-      role: "",
+      title: "",
+      description: "",
+      dateStart: null,
+      dateEnd: null,
     }
   );
   const [disabledSubmit, setDisabledSubmit] = useState(true);
@@ -81,6 +83,16 @@ const ChallengesStaff = (props) => {
       default:
         return null;
     }
+  };
+
+  const handleEditDateChallenge = (date, field) => {
+    const auxChallenge = {
+      ...challenge,
+      [field]: date,
+    };
+    setChallenge(auxChallenge);
+    checkDisabledSubmit(auxChallenge);
+    console.log(date);
   };
 
   const handleEditChallenge = (event) => {
@@ -174,7 +186,6 @@ const ChallengesStaff = (props) => {
         onClose={handleDialogAddChallenge}
         fullWidth
         maxWidth="md"
-        title="Añadir empleado"
       >
         <DialogTitle
           style={{
@@ -185,101 +196,106 @@ const ChallengesStaff = (props) => {
           }}
         >
           <Typography variant="h6" align="center">
-            <FaceIcon style={{ fontSize: "48px" }} />
-          </Typography>
-          <Typography variant="h6" align="center">
-            Añadir usuario
+            Añadir competición
           </Typography>
         </DialogTitle>
         <DialogContent>
           <form
             action={
-              props.appChallenge
-                ? props.appChallenge.role === "admin"
-                  ? "/admin/challenges"
-                  : props.appChallenge.role === "staff"
-                  ? "/staff/challenges"
-                  : "/staff/challenges"
-                : "/staff/challenges"
+              props.appUser
+                ? props.appUser.role === "admin"
+                  ? `/admin/challenges`
+                  : props.appUser.role === "employee"
+                  ? `/staff/challenges`
+                  : `/staff/challenges`
+                : `/staff/challenges`
             }
             method="post"
+            enctype="multipart/form-data"
           >
             <Grid container spacing={2}>
+              <input
+                type="hidden"
+                name="dateStart"
+                value={
+                  challenge.dateStart ? challenge.dateStart.toString() : ""
+                }
+              />
+              <input
+                type="hidden"
+                name="dateEnd"
+                value={challenge.dateEnd ? challenge.dateEnd.toString() : ""}
+              />
               <Grid item xs={12}>
                 {handleAlert()}
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12}>
                 <TextField
                   variant="outlined"
                   margin="normal"
-                  placeholder="Introduce nombre"
+                  placeholder="Titulo de la competición"
                   label="Nombre"
-                  name="name"
-                  value={challenge.name}
+                  name="title"
+                  value={challenge.title}
                   onChange={handleEditChallenge}
                   fullWidth
                 />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  placeholder="Introduce apellidos"
-                  label="Apellidos"
-                  name="surname"
-                  value={challenge.surname}
-                  onChange={handleEditChallenge}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  placeholder="Introduce nombre de usuario"
-                  label="Nombre usuario"
-                  value={challenge.challengename}
-                  onChange={handleEditChallenge}
-                  name="challengename"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl
-                  variant="outlined"
-                  className={classes.formControl}
-                  margin="normal"
-                  fullWidth
-                >
-                  <InputLabel id="demo-simple-select-outlined-label">
-                    Rol
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-outlined-label"
-                    id="demo-simple-select-outlined"
-                    name="role"
-                    value={challenge.role}
-                    required
-                    fullWidth
-                    onChange={handleEditChallenge}
-                    label="Rol"
-                  >
-                    <MenuItem value="player">Player</MenuItem>
-                    <MenuItem value="challenger">Challenger</MenuItem>
-                  </Select>
-                </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   variant="outlined"
                   margin="normal"
-                  placeholder="email@email.com"
-                  value={challenge.email}
+                  placeholder="Descripción de la competición"
+                  label="Descripción"
+                  name="description"
+                  multiline
+                  rows={10}
+                  value={challenge.description}
                   onChange={handleEditChallenge}
-                  label="Email"
-                  name="email"
                   fullWidth
                 />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <DatePicker
+                  date={challenge.dateStart}
+                  variant="dialog"
+                  format="DD/MM/YYYY"
+                  onChangeDate={(date) =>
+                    handleEditDateChallenge(date, "dateStart")
+                  }
+                  required={props.required}
+                  label="Fecha inicio"
+                  style={{ width: "100%" }}
+                  okLabel="Aceptar"
+                  cancelLabel="Cancelar"
+                  invalidDateMessage="Fecha incorrecta"
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <DatePicker
+                  date={challenge.dateEnd}
+                  variant="dialog"
+                  format="DD/MM/YYYY"
+                  label="Fecha fin"
+                  onChangeDate={(date) =>
+                    handleEditDateChallenge(date, "dateEnd")
+                  }
+                  required={props.required}
+                  style={{ width: "100%" }}
+                  okLabel="Aceptar"
+                  cancelLabel="Cancelar"
+                  invalidDateMessage="Fecha incorrecta"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="body1">
+                  Fichero de la competición
+                </Typography>
+                <input type="file" name="competition" />
+                <Typography variant="body1">
+                  Fichero 2 de la competición
+                </Typography>
+                <input type="file" name="test_competition" />
               </Grid>
               <Grid item xs={12}>
                 <Button
@@ -289,7 +305,7 @@ const ChallengesStaff = (props) => {
                   fullWidth
                   type="submit"
                 >
-                  Crear usuario
+                  Editar competición
                 </Button>
               </Grid>
             </Grid>

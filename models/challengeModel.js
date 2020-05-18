@@ -16,6 +16,14 @@ const ChallengeSchema = new Schema(
       type: String,
       required: true,
     },
+    dateStart: {
+      type: String,
+      required: true,
+    },
+    dateEnd: {
+      type: String,
+      required: true,
+    },
     participant: [
       {
         userId: {

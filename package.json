@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/SergioRedondoMontes/Web_Servidor_Kaggle#readme",
   "dependencies": {
+    "@date-io/moment": "^1.3.9",
+    "@material-ui/pickers": "^3.2.3",
     "@material-ui/core": "^4.9.14",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.53",
