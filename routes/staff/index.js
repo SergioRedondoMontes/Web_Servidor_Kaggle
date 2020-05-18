@@ -143,7 +143,12 @@ router.post(
   controllers.staff.updateChallenge
 );
 
-router.delete("/challenges/:challengeId", controllers.staff.deleteChallenge);
+router.get(
+  "/challenges/:challengeId/delete",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthStaff,
+  controllers.staff.deleteChallenge
+);
 
 router.put(
   "/challenges/:challengeId/participants",

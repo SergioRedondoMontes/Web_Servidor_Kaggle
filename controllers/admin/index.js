@@ -309,10 +309,7 @@ exports.deleteChallenge = async (req, res, next) => {
   try {
     const challengeId = req.params.challengeId;
     await Challenge.findByIdAndDelete(challengeId);
-    res.status(200).json({
-      data: null,
-      message: "Challenge has been deleted",
-    });
+    res.redirect("/admin/challenges");
   } catch (error) {
     next(error);
   }

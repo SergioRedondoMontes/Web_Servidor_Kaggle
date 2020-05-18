@@ -155,8 +155,8 @@ router.put(
   controllers.admin.updateRanking
 );
 
-router.delete(
-  "/challenges/:challengeId",
+router.get(
+  "/challenges/:challengeId/delete",
   middleWares.auth.checkLoggedIn,
   middleWares.auth.checkAuthAdmin,
   controllers.admin.deleteChallenge

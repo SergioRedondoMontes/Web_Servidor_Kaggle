@@ -34,6 +34,7 @@ import {
 } from "@material-ui/core";
 import { AppBar } from "../../../viewsComponents/AppBar";
 
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import EditIcon from "@material-ui/icons/Edit";
 
 const useStyles = makeStyles((theme) => ({
@@ -408,10 +409,25 @@ const ChallengeStaff = (props) => {
                 </Typography>
                 <Button
                   variant="contained"
-                  style={{ background: "yellow" }}
+                  style={{ background: "yellow", marginRight: "16px" }}
                   onClick={handleDialogEditChallenge}
                 >
                   <EditIcon />
+                </Button>
+                <Button
+                  variant="contained"
+                  style={{ background: "red" }}
+                  href={
+                    props.appUser
+                      ? props.appUser.role === "admin"
+                        ? `/admin/challenges/${props.challenge._id.toString()}/delete`
+                        : props.appUser.role === "employee"
+                        ? `/staff/challenges/${props.challenge._id.toString()}/delete`
+                        : `/staff/challenges/${props.challenge._id.toString()}/delete`
+                      : `/staff/challenges/${props.challenge._id.toString()}/delete`
+                  }
+                >
+                  <HighlightOffIcon />
                 </Button>
               </div>
               <Divider style={{ margin: "12px 0" }} />
