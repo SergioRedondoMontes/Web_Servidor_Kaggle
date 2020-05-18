@@ -221,7 +221,7 @@ exports.updateChallenge = async (req, res, next) => {
     const challengeId = req.params.challengeId;
     await Challenge.findByIdAndUpdate(challengeId, update);
     const challenge = await Challenge.findById(challengeId);
-    res.redirect(`/staff/challenges/${challenge._id.toString()}`);
+    res.redirect(`/admin/challenges/${challenge._id.toString()}`);
   } catch (error) {
     next(error);
   }
