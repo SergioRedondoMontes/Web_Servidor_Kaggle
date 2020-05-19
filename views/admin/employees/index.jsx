@@ -17,6 +17,7 @@ import PersonAddIcon from "@material-ui/icons/PersonAdd";
 
 import { Helmet } from "react-helmet";
 import { DataTables } from "../../../viewsComponents/DataTables";
+import { Drawer } from "../../../viewsComponents/Drawer";
 import { Chip, Dialog, DialogContent, DialogTitle } from "@material-ui/core";
 import { AppBar } from "../../../viewsComponents/AppBar";
 import FaceIcon from "@material-ui/icons/Face";
@@ -54,6 +55,9 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     marginTop: "100px",
+    flexGrow: 1,
+    marginLeft: "240px",
+    padding: theme.spacing(3),
   },
 }));
 
@@ -255,33 +259,34 @@ const EmployeesAdmin = (props) => {
       <Helmet>
         <title>KAGGLE STAFF | EMPLOYEES</title>
       </Helmet>
-      <div style={{ display: "flex" }}>
-        <AppBar loggedIn={props.loggedIn} user={props.appUser} />
-      </div>
-      <Grid item xs={1} />
-      <Grid item xs={10}>
-        <div className={classes.content}>
-          <Grid container spacing={2}>
-            <Grid
-              item
-              xs={12}
-              style={{ display: "flex", justifyContent: "flex-end" }}
-            >
-              <div>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={handleDialogAddEmployee}
-                >
-                  <PersonAddIcon />
-                </Button>
-              </div>
+      <Grid item xs={12}>
+        <div style={{ display: "flex" }}>
+          <AppBar loggedIn={props.loggedIn} user={props.appUser} />
+          <Drawer user={props.appUser} />
+
+          <div className={classes.content}>
+            <Grid container spacing={2}>
+              <Grid
+                item
+                xs={12}
+                style={{ display: "flex", justifyContent: "flex-end" }}
+              >
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={handleDialogAddEmployee}
+                  >
+                    <PersonAddIcon />
+                  </Button>
+                </div>
+              </Grid>
+              <Grid item xs={12}>
+                <DataTables data={props.employees} columns={createColumns()} />
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <DataTables data={props.employees} columns={createColumns()} />
-            </Grid>
-          </Grid>
+          </div>
         </div>
       </Grid>
     </Grid>

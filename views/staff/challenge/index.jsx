@@ -17,6 +17,7 @@ import moment from "moment";
 
 import { Helmet } from "react-helmet";
 import { DataTables } from "../../../viewsComponents/DataTables";
+import { Drawer } from "../../../viewsComponents/Drawer";
 import { DatePicker } from "../../../viewsComponents/DatePicker";
 import {
   Chip,
@@ -61,6 +62,9 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     marginTop: "100px",
+    flexGrow: 1,
+    marginLeft: "240px",
+    padding: theme.spacing(3),
   },
 }));
 
@@ -369,86 +373,85 @@ const ChallengeStaff = (props) => {
           </form>
         </DialogContent>
       </Dialog>
-
-      <div style={{ display: "flex" }}>
-        <AppBar loggedIn={props.loggedIn} user={props.appUser} />
-      </div>
       <Helmet>
         <title>KAGGLE STAFF</title>
       </Helmet>
+      <Grid item xs={12}>
+        <div style={{ display: "flex" }}>
+          <AppBar loggedIn={props.loggedIn} user={props.appUser} />
+          <Drawer user={props.appUser} />
 
-      <Grid item xs={1} />
-      <Grid item xs={10}>
-        <div className={classes.content}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Breadcrumbs aria-label="breadcrumb">
-                <Link
-                  color="inherit"
-                  href={
-                    props.appUser
-                      ? props.appUser.role === "admin"
-                        ? `/admin/challenges`
-                        : props.appUser.role === "employee"
-                        ? `/staff/challenges`
+          <div className={classes.content}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Breadcrumbs aria-label="breadcrumb">
+                  <Link
+                    color="inherit"
+                    href={
+                      props.appUser
+                        ? props.appUser.role === "admin"
+                          ? `/admin/challenges`
+                          : props.appUser.role === "employee"
+                          ? `/staff/challenges`
+                          : `/staff/challenges`
                         : `/staff/challenges`
-                      : `/staff/challenges`
-                  }
-                >
-                  Competiciones
-                </Link>
-                <Typography variant="body1">
-                  {props.challenge._id.toString()}
-                </Typography>
-              </Breadcrumbs>
-            </Grid>
-            <Grid item xs={12}>
-              <div style={{ display: "flex" }}>
-                <Typography variant="h4" style={{ flex: "1" }}>
-                  {props.challenge.title}
-                </Typography>
-                <Button
-                  variant="contained"
-                  style={{ background: "yellow", marginRight: "16px" }}
-                  onClick={handleDialogEditChallenge}
-                >
-                  <EditIcon />
-                </Button>
-                <Button
-                  variant="contained"
-                  style={{ background: "red" }}
-                  href={
-                    props.appUser
-                      ? props.appUser.role === "admin"
-                        ? `/admin/challenges/${props.challenge._id.toString()}/delete`
-                        : props.appUser.role === "employee"
-                        ? `/staff/challenges/${props.challenge._id.toString()}/delete`
+                    }
+                  >
+                    Competiciones
+                  </Link>
+                  <Typography variant="body1">
+                    {props.challenge._id.toString()}
+                  </Typography>
+                </Breadcrumbs>
+              </Grid>
+              <Grid item xs={12}>
+                <div style={{ display: "flex" }}>
+                  <Typography variant="h4" style={{ flex: "1" }}>
+                    {props.challenge.title}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    style={{ background: "yellow", marginRight: "16px" }}
+                    onClick={handleDialogEditChallenge}
+                  >
+                    <EditIcon />
+                  </Button>
+                  <Button
+                    variant="contained"
+                    style={{ background: "red" }}
+                    href={
+                      props.appUser
+                        ? props.appUser.role === "admin"
+                          ? `/admin/challenges/${props.challenge._id.toString()}/delete`
+                          : props.appUser.role === "employee"
+                          ? `/staff/challenges/${props.challenge._id.toString()}/delete`
+                          : `/staff/challenges/${props.challenge._id.toString()}/delete`
                         : `/staff/challenges/${props.challenge._id.toString()}/delete`
-                      : `/staff/challenges/${props.challenge._id.toString()}/delete`
-                  }
+                    }
+                  >
+                    <HighlightOffIcon />
+                  </Button>
+                </div>
+                <Divider style={{ margin: "12px 0" }} />
+                <Typography variant="body1">
+                  {props.challenge.description}
+                </Typography>
+                <Tabs
+                  style={{ margin: "12px 0" }}
+                  value={valueTab}
+                  variant="fullWidth"
+                  onChange={(e, value) => {
+                    setValueTab(value);
+                  }}
+                  aria-label="simple tabs example"
                 >
-                  <HighlightOffIcon />
-                </Button>
-              </div>
-              <Divider style={{ margin: "12px 0" }} />
-              <Typography variant="body1">
-                {props.challenge.description}
-              </Typography>
-              <Tabs
-                style={{ margin: "12px 0" }}
-                value={valueTab}
-                variant="fullWidth"
-                onChange={(e, value) => {
-                  setValueTab(value);
-                }}
-                aria-label="simple tabs example"
-              >
-                <Tab label="Ranking" value="ranking" />
-                <Tab label="Participantes" value="participants" />
-              </Tabs>
-              {renderContentTab()}
+                  <Tab label="Ranking" value="ranking" />
+                  <Tab label="Participantes" value="participants" />
+                </Tabs>
+                {renderContentTab()}
+              </Grid>
             </Grid>
-          </Grid>
+          </div>
         </div>
       </Grid>
     </Grid>

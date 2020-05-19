@@ -32,6 +32,7 @@ import {
   Breadcrumbs,
 } from "@material-ui/core";
 import { AppBar } from "../../../viewsComponents/AppBar";
+import { Drawer } from "../../../viewsComponents/Drawer";
 
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import FaceIcon from "@material-ui/icons/Face";
@@ -61,6 +62,9 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     marginTop: "100px",
+    flexGrow: 1,
+    marginLeft: "240px",
+    padding: theme.spacing(3),
   },
 }));
 
@@ -222,106 +226,110 @@ const UserStaff = (props) => {
           </form>
         </DialogContent>
       </Dialog>
-
-      <div style={{ display: "flex" }}>
-        <AppBar loggedIn={props.loggedIn} user={props.appUser} />
-      </div>
       <Helmet>
         <title>KAGGLE STAFF</title>
       </Helmet>
+      <Grid item xs={12}>
+        <div style={{ display: "flex" }}>
+          <AppBar loggedIn={props.loggedIn} user={props.appUser} />
+          <Drawer user={props.appUser} />
 
-      <Grid item xs={1} />
-      <Grid item xs={10}>
-        <div className={classes.content}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Breadcrumbs aria-label="breadcrumb">
-                <Link color="inherit" href="/staff/users">
-                  Usuarios
-                </Link>
-                <Typography variant="body1">
-                  {props.user._id.toString()}
-                </Typography>
-              </Breadcrumbs>
-            </Grid>
-            <Grid item xs={12}>
-              <div style={{ display: "flex" }}>
-                <Typography variant="h4" style={{ flex: "1" }}>
-                  {props.user.name + " " + props.user.surname}
-                </Typography>
-                {(props.appUser.role === "employee" &&
-                  props.user.role !== "employee" &&
-                  props.user.role !== "admin") ||
-                (props.appUser.role === "employee" &&
-                  props.appUser._id.toString() == props.user._id.toString()) ||
-                props.appUser.role === "admin" ? (
-                  <Button
-                    style={{ marginRight: "16px" }}
-                    disabled={props.user.resetPassword}
-                    variant="contained"
-                    color="primary"
-                    href={
-                      props.appUser
-                        ? props.appUser.role === "admin"
-                          ? `/admin/users/${props.user._id.toString()}/resetPassword`
-                          : props.appUser.role === "employee"
-                          ? `/staff/users/${props.user._id.toString()}/resetPassword`
+          <div className={classes.content}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Breadcrumbs aria-label="breadcrumb">
+                  <Link color="inherit" href="/staff/users">
+                    Usuarios
+                  </Link>
+                  <Typography variant="body1">
+                    {props.user._id.toString()}
+                  </Typography>
+                </Breadcrumbs>
+              </Grid>
+              <Grid item xs={12}>
+                <div style={{ display: "flex" }}>
+                  <Typography variant="h4" style={{ flex: "1" }}>
+                    {props.user.name + " " + props.user.surname}
+                  </Typography>
+                  {(props.appUser.role === "employee" &&
+                    props.user.role !== "employee" &&
+                    props.user.role !== "admin") ||
+                  (props.appUser.role === "employee" &&
+                    props.appUser._id.toString() ==
+                      props.user._id.toString()) ||
+                  props.appUser.role === "admin" ? (
+                    <Button
+                      style={{ marginRight: "16px" }}
+                      disabled={props.user.resetPassword}
+                      variant="contained"
+                      color="primary"
+                      href={
+                        props.appUser
+                          ? props.appUser.role === "admin"
+                            ? `/admin/users/${props.user._id.toString()}/resetPassword`
+                            : props.appUser.role === "employee"
+                            ? `/staff/users/${props.user._id.toString()}/resetPassword`
+                            : `/staff/users/${props.user._id.toString()}/resetPassword`
                           : `/staff/users/${props.user._id.toString()}/resetPassword`
-                        : `/staff/users/${props.user._id.toString()}/resetPassword`
-                    }
-                  >
-                    {props.user.resetPassword
-                      ? "Contraseña reseteada"
-                      : "Resetear contraseña"}
-                  </Button>
-                ) : null}
-                {(props.appUser.role === "employee" &&
-                  props.user.role !== "employee" &&
-                  props.user.role !== "admin") ||
-                (props.appUser.role === "employee" &&
-                  props.appUser._id.toString() == props.user._id.toString()) ||
-                props.appUser.role === "admin" ? (
-                  <Button
-                    variant="contained"
-                    style={{ background: "yellow", marginRight: "16px" }}
-                    onClick={handleDialogEditUser}
-                  >
-                    <EditIcon />
-                  </Button>
-                ) : null}
-                {(props.appUser.role === "employee" &&
-                  props.user.role !== "employee" &&
-                  props.user.role !== "admin") ||
-                (props.appUser.role === "employee" &&
-                  props.appUser._id.toString() == props.user._id.toString()) ||
-                props.appUser.role === "admin" ? (
-                  <Button
-                    variant="contained"
-                    style={{ background: "red" }}
-                    href={
-                      props.appUser
-                        ? props.appUser.role === "admin"
-                          ? `/admin/users/${props.user._id.toString()}/delete`
-                          : props.appUser.role === "employee"
-                          ? `/staff/users/${props.user._id.toString()}/delete`
+                      }
+                    >
+                      {props.user.resetPassword
+                        ? "Contraseña reseteada"
+                        : "Resetear contraseña"}
+                    </Button>
+                  ) : null}
+                  {(props.appUser.role === "employee" &&
+                    props.user.role !== "employee" &&
+                    props.user.role !== "admin") ||
+                  (props.appUser.role === "employee" &&
+                    props.appUser._id.toString() ==
+                      props.user._id.toString()) ||
+                  props.appUser.role === "admin" ? (
+                    <Button
+                      variant="contained"
+                      style={{ background: "yellow", marginRight: "16px" }}
+                      onClick={handleDialogEditUser}
+                    >
+                      <EditIcon />
+                    </Button>
+                  ) : null}
+                  {(props.appUser.role === "employee" &&
+                    props.user.role !== "employee" &&
+                    props.user.role !== "admin") ||
+                  (props.appUser.role === "employee" &&
+                    props.appUser._id.toString() ==
+                      props.user._id.toString()) ||
+                  props.appUser.role === "admin" ? (
+                    <Button
+                      variant="contained"
+                      style={{ background: "red" }}
+                      href={
+                        props.appUser
+                          ? props.appUser.role === "admin"
+                            ? `/admin/users/${props.user._id.toString()}/delete`
+                            : props.appUser.role === "employee"
+                            ? `/staff/users/${props.user._id.toString()}/delete`
+                            : `/staff/users/${props.user._id.toString()}/delete`
                           : `/staff/users/${props.user._id.toString()}/delete`
-                        : `/staff/users/${props.user._id.toString()}/delete`
-                    }
-                  >
-                    <HighlightOffIcon />
-                  </Button>
-                ) : null}
-              </div>
-              <Divider style={{ margin: "12px 0" }} />
-              <Typography variant="body1">
-                Nombre de usuario: {props.user.username}
-              </Typography>
-              <Typography variant="body1">Email: {props.user.email}</Typography>
-              <Typography variant="body1">
-                Rol: {<Chip label={props.user.role} />}
-              </Typography>
+                      }
+                    >
+                      <HighlightOffIcon />
+                    </Button>
+                  ) : null}
+                </div>
+                <Divider style={{ margin: "12px 0" }} />
+                <Typography variant="body1">
+                  Nombre de usuario: {props.user.username}
+                </Typography>
+                <Typography variant="body1">
+                  Email: {props.user.email}
+                </Typography>
+                <Typography variant="body1">
+                  Rol: {<Chip label={props.user.role} />}
+                </Typography>
+              </Grid>
             </Grid>
-          </Grid>
+          </div>
         </div>
       </Grid>
     </Grid>

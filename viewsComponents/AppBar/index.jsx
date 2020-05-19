@@ -19,6 +19,9 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
   menuButton: {
     marginRight: theme.spacing(2),
   },
@@ -51,79 +54,70 @@ const AppBar = (props) => {
   const createMenuItem = (role) => {
     switch (role) {
       case "player":
-        return (
-          <>
-            <MenuItem>
-              <Link
-                href={`/users/${props.user ? props.user._id : null}`}
-                className={classes.link}
-              >
-                Mi perfil
-              </Link>
-            </MenuItem>
-            <MenuItem>
-              <Link href={`/signout`} className={classes.link}>
-                Cerrar sesión
-              </Link>
-            </MenuItem>
-          </>
-        );
-        break;
+        return [
+          <MenuItem>
+            <Link
+              href={`/users/${props.user ? props.user._id : null}`}
+              className={classes.link}
+            >
+              Mi perfil
+            </Link>
+          </MenuItem>,
+          <MenuItem>
+            <Link href={`/signout`} className={classes.link}>
+              Cerrar sesión
+            </Link>
+          </MenuItem>,
+        ];
+
       case "challenger":
-        return (
-          <>
-            <MenuItem>
-              <Link
-                href={`/users/${props.user ? props.user._id : null}`}
-                className={classes.link}
-              >
-                Mi perfil
-              </Link>
-            </MenuItem>
-            <MenuItem>
-              <Link href={`/signout`} className={classes.link}>
-                Cerrar sesión
-              </Link>
-            </MenuItem>
-          </>
-        );
-        break;
+        return [
+          <MenuItem>
+            <Link
+              href={`/users/${props.user ? props.user._id : null}`}
+              className={classes.link}
+            >
+              Mi perfil
+            </Link>
+          </MenuItem>,
+          <MenuItem>
+            <Link href={`/signout`} className={classes.link}>
+              Cerrar sesión
+            </Link>
+          </MenuItem>,
+        ];
+
       case "employee":
-        return (
-          <>
-            <MenuItem>
-              <Link
-                href={`/users/${props.user ? props.user._id : null}`}
-                className={classes.link}
-              >
-                Mi perfil
-              </Link>
-            </MenuItem>
-            <MenuItem>
-              <Link href={`/staff/signout`}>Cerrar sesión</Link>
-            </MenuItem>
-          </>
-        );
-        break;
+        return [
+          <MenuItem>
+            <Link
+              href={`/users/${props.user ? props.user._id : null}`}
+              className={classes.link}
+            >
+              Mi perfil
+            </Link>
+          </MenuItem>,
+          <MenuItem>
+            <Link href={`/staff/signout`}>Cerrar sesión</Link>
+          </MenuItem>,
+        ];
+
       case "admin":
-        return (
-          <>
-            <MenuItem>
-              <Link
-                className={classes.link}
-                href={`/admin/users/${props.user ? props.user._id : null}`}
-              >
-                Mi perfil
-              </Link>
-            </MenuItem>
-            <MenuItem>
-              <Link href={`/admin/signout`} className={classes.link}>
-                Cerrar sesión
-              </Link>
-            </MenuItem>
-          </>
-        );
-        break;
+        return [
+          <MenuItem>
+            <Link
+              className={classes.link}
+              href={`/admin/users/${props.user ? props.user._id : null}`}
+            >
+              Mi perfil
+            </Link>
+          </MenuItem>,
+          <MenuItem>
+            <Link href={`/admin/signout`} className={classes.link}>
+              Cerrar sesión
+            </Link>
+          </MenuItem>,
+        ];
 
       default:
         break;
@@ -144,58 +138,56 @@ const AppBar = (props) => {
     }
   };
   return (
-    <div className={classes.root}>
-      <AppBarMui position="fixed">
-        <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            <Link
-              className={classes.link}
-              href={createTitleHref(props.user ? props.user.role : null)}
+    <AppBarMui position="fixed" className={classes.appBar}>
+      <Toolbar>
+        <Typography variant="h6" className={classes.title}>
+          <Link
+            className={classes.link}
+            href={createTitleHref(props.user ? props.user.role : null)}
+          >
+            KAGGLE
+          </Link>
+        </Typography>
+        {props.loggedIn ? (
+          <div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
+              onClick={handleMenu}
             >
-              KAGGLE
-            </Link>
-          </Typography>
-          {props.loggedIn ? (
-            <div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  cursor: "pointer",
-                }}
-                onClick={handleMenu}
-              >
-                <Typography variant="caption">
-                  {props.user ? props.user.name || props.user.role : "user"}
-                </Typography>
-                <ArrowDropDownIcon />
-              </div>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={open}
-                onClose={handleClose}
-              >
-                {createMenuItem(props.user ? props.user.role || null : null)}
-              </Menu>
+              <Typography variant="caption">
+                {props.user ? props.user.name || props.user.role : "user"}
+              </Typography>
+              <ArrowDropDownIcon />
             </div>
-          ) : (
-            <Button color="inherit" href="/login">
-              Login
-            </Button>
-          )}
-        </Toolbar>
-      </AppBarMui>
-    </div>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={open}
+              onClose={handleClose}
+            >
+              {createMenuItem(props.user ? props.user.role || null : null)}
+            </Menu>
+          </div>
+        ) : (
+          <Button color="inherit" href="/login">
+            Login
+          </Button>
+        )}
+      </Toolbar>
+    </AppBarMui>
   );
 };
 

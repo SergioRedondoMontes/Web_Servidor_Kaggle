@@ -27,7 +27,7 @@ import {
   MenuItem,
 } from "@material-ui/core";
 import { AppBar } from "../../../viewsComponents/AppBar";
-
+import { Drawer } from "../../../viewsComponents/Drawer";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import FaceIcon from "@material-ui/icons/Face";
 
@@ -55,6 +55,9 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     marginTop: "100px",
+    flexGrow: 1,
+    marginLeft: "240px",
+    padding: theme.spacing(3),
   },
 }));
 
@@ -300,38 +303,36 @@ const UsersStaff = (props) => {
           </form>
         </DialogContent>
       </Dialog>
-
-      <div style={{ display: "flex" }}>
-        <AppBar loggedIn={props.loggedIn} user={props.appUser} />
-      </div>
       <Helmet>
         <title>KAGGLE STAFF | USERS</title>
       </Helmet>
-
-      <Grid item xs={1} />
-      <Grid item xs={10}>
-        <div className={classes.content}>
-          <Grid container spacing={2}>
-            <Grid
-              item
-              xs={12}
-              style={{ display: "flex", justifyContent: "flex-end" }}
-            >
-              <div>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={handleDialogAddUser}
-                >
-                  <PersonAddIcon />
-                </Button>
-              </div>
+      <Grid item xs={12}>
+        <div style={{ display: "flex" }}>
+          <AppBar loggedIn={props.loggedIn} user={props.appUser} />
+          <Drawer user={props.appUser} />
+          <div className={classes.content}>
+            <Grid container spacing={2}>
+              <Grid
+                item
+                xs={12}
+                style={{ display: "flex", justifyContent: "flex-end" }}
+              >
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={handleDialogAddUser}
+                  >
+                    <PersonAddIcon />
+                  </Button>
+                </div>
+              </Grid>
+              <Grid item xs={12}>
+                <DataTables data={props.users} columns={createColumns()} />
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <DataTables data={props.users} columns={createColumns()} />
-            </Grid>
-          </Grid>
+          </div>
         </div>
       </Grid>
     </Grid>
