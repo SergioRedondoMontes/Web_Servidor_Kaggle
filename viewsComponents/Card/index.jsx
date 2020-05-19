@@ -7,6 +7,8 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import { Chip } from "@material-ui/core";
+import moment from "moment";
 
 const useStyles = makeStyles({
   root: {
@@ -28,9 +30,30 @@ const Card = (props) => {
           title={props.challenge.title}
         />
         <CardContent>
-          <Typography gutterBottom variant="h5" component="h2">
-            {props.challenge.title}
-          </Typography>
+          <div style={{ display: "flex", flexFlow: "row nowrap" }}>
+            <Typography
+              gutterBottom
+              variant="h5"
+              component="h2"
+              style={{ flex: "1" }}
+            >
+              {props.challenge.title}
+            </Typography>
+            <Chip
+              label={
+                moment().isBefore(moment(props.challenge.dateStart))
+                  ? "Próximamente"
+                  : moment().isBetween(
+                      moment(props.challenge.dateStart),
+                      moment(props.challenge.dateEnd)
+                    )
+                  ? "En proceso"
+                  : moment().isAfter(moment(props.challenge.dateEnd))
+                  ? "Finalizado"
+                  : "Finalizado"
+              }
+            />
+          </div>
           <Typography variant="body2" color="textSecondary" component="p">
             {props.challenge.description}
           </Typography>

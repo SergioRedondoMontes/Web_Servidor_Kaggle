@@ -15,11 +15,12 @@ import { makeStyles } from "@material-ui/core/styles";
 import Alert from "@material-ui/lab/Alert";
 import { AppBar } from "../../../viewsComponents/AppBar";
 import { Card } from "../../../viewsComponents/Card";
+import { DataTables } from "../../../viewsComponents/DataTables";
 
 import moment from "moment";
 
 import { Helmet } from "react-helmet";
-import { Chip, Divider } from "@material-ui/core";
+import { Chip, Divider, Tabs, Tab } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -57,8 +58,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Challenges = (props) => {
+const Challenge = (props) => {
   const classes = useStyles();
+  const [valueTab, setValueTab] = useState(
+    props.alert
+      ? props.alert === "participant_added"
+        ? "participate"
+        : "participants"
+      : "participants"
+  );
+
   const challenge = {
     ...props.challenge,
     dateStart: moment(props.challenge.dateStart),
@@ -68,55 +77,207 @@ const Challenges = (props) => {
       : moment().isBetween(
           moment(props.challenge.dateStart),
           moment(props.challenge.dateEnd)
-            ? "in_process"
-            : moment().isAfter(moment(props.challenge.dateEnd))
-            ? "finished"
-            : "finished"
-        ),
+        )
+      ? "in_progress"
+      : moment().isAfter(moment(props.challenge.dateEnd))
+      ? "finished"
+      : "finished",
   };
 
   const createLabelChip = () => {
-    console.log(
-      moment(props.challenge.dateStart)
-        ? "comming_soon"
-        : moment().isBetween(
-            moment(props.challenge.dateStart),
-            moment(props.challenge.dateEnd)
-              ? "in_process"
-              : moment().isAfter(moment(props.challenge.dateEnd))
-              ? "finished"
-              : "finished"
-          )
-    );
     switch (challenge.status) {
       case "comming_soon":
         return "Próximamente";
 
-      case "in_process":
+      case "in_progress":
         return "En proceso";
 
       case "finished":
         return "Finalizado";
 
       default:
-        return "hola";
-        break;
+        return "";
     }
   };
+
+  const createColumnsParticipants = () => {
+    return [
+      {
+        name: "userId",
+        label: "Id usuario",
+        options: {
+          filter: false,
+          display: false,
+        },
+      },
+      {
+        name: "username",
+        label: "Username",
+        options: {
+          filter: true,
+        },
+      },
+      {
+        name: "date",
+        label: "Fecha",
+        options: {
+          filter: false,
+          customBodyRender: (value, tableMeta, updateValue) => (
+            <Typography variant="body2">{moment(value).fromNow()}</Typography>
+          ),
+        },
+      },
+    ];
+  };
+
+  const createColumnsRanking = () => {
+    return [
+      {
+        name: "userId",
+        label: "Id usuario",
+        options: {
+          filter: false,
+          display: false,
+        },
+      },
+      {
+        name: "username",
+        label: "Username",
+        options: {
+          filter: true,
+        },
+      },
+      {
+        name: "score",
+        label: "Puntuación",
+        options: {
+          filter: true,
+        },
+      },
+      {
+        name: "date",
+        label: "Fecha",
+        options: {
+          filter: false,
+          customBodyRender: (value, tableMeta, updateValue) => (
+            <Typography variant="body2">{moment(value).fromNow()}</Typography>
+          ),
+        },
+      },
+    ];
+  };
+
+  const renderContentTab = () => {
+    switch (valueTab) {
+      case "ranking":
+        return (
+          <DataTables
+            data={props.challenge.ranking}
+            columns={createColumnsRanking()}
+          />
+        );
+      case "participants":
+        return (
+          <DataTables
+            data={props.challenge.participant}
+            columns={createColumnsParticipants()}
+          />
+        );
+      case "participate":
+        return (
+          <Grid container justify="center">
+            {props.loggedIn ? (
+              !challenge.participant.find(
+                (_participant) => _participant.userId == props.appUser._id
+              ) ? (
+                <Grid
+                  item
+                  xs={8}
+                  style={{
+                    display: "flex",
+                    textAlign: "center",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Typography variant="body1">¿Quieres participar?</Typography>
+                  <form
+                    action={`/challenges/${challenge._id}/participants`}
+                    method="post"
+                  >
+                    <Button type="submit" variant="contained" color="primary">
+                      APUNTATE YA
+                    </Button>
+                  </form>
+                </Grid>
+              ) : (
+                <Grid item xs={8}>
+                  {/* TODO FILE SAVER */}
+                </Grid>
+              )
+            ) : (
+              <Grid
+                item
+                xs={8}
+                style={{
+                  display: "flex",
+                  textAlign: "center",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography variant="body1">¿Quieres participar?</Typography>
+                <Typography variant="body1">
+                  Necesitas estar registrado en nuestro portal para participar
+                </Typography>
+
+                <Button href="/login" variant="contained" color="primary">
+                  INICIAR SESION
+                </Button>
+                <Typography variant="body1">O</Typography>
+                <Button href="/signup" variant="contained" color="primary">
+                  CREAR USUARIO
+                </Button>
+              </Grid>
+            )}
+          </Grid>
+        );
+      default:
+        return null;
+    }
+  };
+
+  console.log("challenge", challenge);
+
+  const handleAlert = () => {
+    switch (props.alert) {
+      case "participant-added":
+        return (
+          <Alert severity="success">
+            Has sido añadido a la competición, abjo tienes los pasos para
+            participar
+          </Alert>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <Grid container component="main" className={classes.root}>
       <Helmet>
         <title>KAGGLE</title>
       </Helmet>
       <AppBar loggedIn={props.loggedIn} user={props.appUser} />
-      <Grid item xs={12} style={{ height: "50vh" }}>
-        <image
-          style={{ height: "50vh" }}
-          src="https://source.unsplash.com/random"
-        />
-      </Grid>
+      <Grid
+        item
+        xs={12}
+        style={{
+          height: "50vh",
+          background: "url('https://source.unsplash.com/random')",
+        }}
+      ></Grid>
       <Grid itemx xs={1} />
       <Grid item xs={10}>
+        {handleAlert()}
         <div style={{ display: "flex", alignItems: "center" }}>
           <Typography variant="h4" style={{ flex: "1" }}>
             {challenge.title}
@@ -125,9 +286,39 @@ const Challenges = (props) => {
         </div>
         <Divider style={{ margin: "12px 0" }} />
         <Typography variant="body1">{challenge.description}</Typography>
+        <Tabs
+          style={{ margin: "12px 0" }}
+          value={valueTab}
+          variant="fullWidth"
+          onChange={(e, value) => {
+            setValueTab(value);
+          }}
+          aria-label="simple tabs example"
+        >
+          <Tab label="Ranking" value="ranking" />
+          <Tab label="Participantes" value="participants" />
+          {challenge.status === "in_progress" && (
+            <Tab
+              label={
+                props.loggedIn
+                  ? challenge.participant
+                    ? challenge.participant.find(
+                        (_participant) =>
+                          _participant.userId == props.appUser._id
+                      )
+                      ? "Instrucciones"
+                      : "Participar"
+                    : "Participar"
+                  : "Participar"
+              }
+              value="participate"
+            />
+          )}
+        </Tabs>
+        {renderContentTab()}
       </Grid>
     </Grid>
   );
 };
 
-export default Challenges;
+export default Challenge;

@@ -309,7 +309,7 @@ const ChallengesStaff = (props) => {
                   fullWidth
                   type="submit"
                 >
-                  Editar competición
+                  Añadir competición
                 </Button>
               </Grid>
             </Grid>
