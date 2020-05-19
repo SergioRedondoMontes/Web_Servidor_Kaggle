@@ -335,7 +335,6 @@ const ChallengeStaff = (props) => {
                   }
                   required={props.required}
                   label="Fecha inicio"
-                  name="dateStart"
                   style={{ width: "100%" }}
                   okLabel="Aceptar"
                   cancelLabel="Cancelar"
