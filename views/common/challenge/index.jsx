@@ -16,7 +16,10 @@ import Alert from "@material-ui/lab/Alert";
 import { AppBar } from "../../../viewsComponents/AppBar";
 import { Card } from "../../../viewsComponents/Card";
 
+import moment from "moment";
+
 import { Helmet } from "react-helmet";
+import { Chip, Divider } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,27 +57,77 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home = (props) => {
+const Challenges = (props) => {
   const classes = useStyles();
-  console.log("props home", props);
+  const challenge = {
+    ...props.challenge,
+    dateStart: moment(props.challenge.dateStart),
+    dateEnd: moment(props.challenge.dateEnd),
+    status: moment().isBefore(moment(props.challenge.dateStart))
+      ? "comming_soon"
+      : moment().isBetween(
+          moment(props.challenge.dateStart),
+          moment(props.challenge.dateEnd)
+            ? "in_process"
+            : moment().isAfter(moment(props.challenge.dateEnd))
+            ? "finished"
+            : "finished"
+        ),
+  };
+
+  const createLabelChip = () => {
+    console.log(
+      moment(props.challenge.dateStart)
+        ? "comming_soon"
+        : moment().isBetween(
+            moment(props.challenge.dateStart),
+            moment(props.challenge.dateEnd)
+              ? "in_process"
+              : moment().isAfter(moment(props.challenge.dateEnd))
+              ? "finished"
+              : "finished"
+          )
+    );
+    switch (challenge.status) {
+      case "comming_soon":
+        return "Próximamente";
+
+      case "in_process":
+        return "En proceso";
+
+      case "finished":
+        return "Finalizado";
+
+      default:
+        return "hola";
+        break;
+    }
+  };
   return (
     <Grid container component="main" className={classes.root}>
       <Helmet>
         <title>KAGGLE</title>
       </Helmet>
       <AppBar loggedIn={props.loggedIn} user={props.appUser} />
-      <Grid item xs={1} />
-      <Grid item xs={10} className={classes.content}>
-        <Grid container spacing={2}>
-          {props.challenges.map((challenge, index) => (
-            <Grid item xs={12} md={4}>
-              <Card challenge={challenge} index={index} />
-            </Grid>
-          ))}
-        </Grid>
+      <Grid item xs={12} style={{ height: "50vh" }}>
+        <image
+          style={{ height: "50vh" }}
+          src="https://source.unsplash.com/random"
+        />
+      </Grid>
+      <Grid itemx xs={1} />
+      <Grid item xs={10}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Typography variant="h4" style={{ flex: "1" }}>
+            {challenge.title}
+          </Typography>
+          <Chip label={createLabelChip()} />
+        </div>
+        <Divider style={{ margin: "12px 0" }} />
+        <Typography variant="body1">{challenge.description}</Typography>
       </Grid>
     </Grid>
   );
 };
 
-export default Home;
+export default Challenges;

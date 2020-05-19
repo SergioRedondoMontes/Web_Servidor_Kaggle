@@ -11,6 +11,16 @@ exports.checkLoggedIn = function (req, res, next) {
   }
 };
 
+exports.checkExistsLoggedIn = function (req, res, next) {
+  try {
+    const user = res.locals.loggedInUser;
+    req.user = user;
+    next();
+  } catch (error) {
+    next();
+  }
+};
+
 exports.grantAccess = function (action, resource) {
   return async (req, res, next) => {
     try {

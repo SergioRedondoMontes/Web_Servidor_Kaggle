@@ -171,8 +171,10 @@ exports.getChallenges = async (req, res, next) => {
   try {
     console.log("entrooooo");
     const challenges = await Challenge.find({});
-    res.status(200).json({
-      data: challenges,
+    res.render("common/home", {
+      challenges: challenges,
+      appUser: req.user || null,
+      loggedIn: req.user ? true : false,
     });
   } catch (error) {
     next(error);
@@ -184,8 +186,10 @@ exports.getChallenge = async (req, res, next) => {
     const challengeId = req.params.challengeId;
     const challenge = await Challenge.findById(challengeId);
     if (!challenge) return next(new Error("Challenge does not exist"));
-    res.status(200).json({
-      data: challenge,
+    res.render("common/challenge", {
+      challenge: challenge,
+      appUser: req.user || null,
+      loggedIn: req.user ? true : false,
     });
   } catch (error) {
     next(error);

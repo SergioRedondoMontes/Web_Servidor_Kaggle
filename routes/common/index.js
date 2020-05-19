@@ -38,13 +38,11 @@ router.post("/login", controllers.common.login);
 
 // HOME
 
-router.get("/", (req, res) => {
-  const user = res.locals.loggedInUser;
-  res.render("common/home", {
-    loggedIn: user ? true : false,
-    user: user || null,
-  });
-});
+router.get(
+  "/",
+  middleWares.auth.checkExistsLoggedIn,
+  controllers.common.getChallenges
+);
 
 router.get("/users/:userId", controllers.common.getUser);
 
@@ -54,7 +52,11 @@ router.delete("/users/:userId", controllers.common.deleteUser);
 
 router.get("/challenges", controllers.common.getChallenges);
 
-router.get("/challenges/:challengeId", controllers.common.getChallenge);
+router.get(
+  "/challenges/:challengeId",
+  middleWares.auth.checkExistsLoggedIn,
+  controllers.common.getChallenge
+);
 
 router.post(
   "/challenges",
