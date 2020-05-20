@@ -132,21 +132,53 @@ exports.postChallenge = async (req, res, next) => {
       ranking: [],
       url_files: { base: "", example: "", dev: "", python: "" },
     });
+
+
     await newChallenge.save();
     const challengeId = newChallenge._id;
-    fs.mkdirSync(`./public/challenges/${challengeId}/`);
-    const paths = [];
+    fs.mkdirSync(`./public/data/challenges/${challengeId}/`);
+    const paths = { base: "", example: req.file["example"][0].path, dev: "", python: "" };
     //TODO: CAMBIAR EL INSERTAR DE UN ARRAY A LOS OBJETOS CORRESPONDIENTES
-    Object.keys(req.files).forEach((file, index) => {
-      const path = `./public/challenges/${challengeId}/${
-        req.files[file][0].path.split("/")[
-          req.files[file][0].path.split("/").length - 1
-        ]
-      }`;
-      fs.renameSync(`./${req.files[file][0].path}`, path);
+    //...................//
+    DataFrame.fromCSV(
+      req.file["base"][0].path
+    ).then((df) => {
+      let df1 = df.drop(df1.listColumns()[df.listColumns().length])
+      //TODO: Cambiar url donde guardar
+      let filename = new Date().getTime()
+      df1.toCSV(true, `./public/data/challenges/${challengeId}/` + filename + '.csv')
+      path.dev = process.env.URL_PAGE +`/data/challenges/${challengeId}/` + filename + '.csv'
+    })
 
-      paths.push(path);
-    });
+    const pathBase = `./public/data/challenges/${challengeId}/${
+      req.files["base"][0].path.split("/")[
+        req.files["base"][0].path.split("/").length - 1
+      ]
+    }`;
+
+
+    fs.renameSync(`./${req.file["base"][0].path}`, pathBase);
+
+    path.base = process.env.URL_PAGE +`/data/challenges/${challengeId}/${
+      req.files["base"][0].path.split("/")[
+        req.files["base"][0].path.split("/").length - 1
+      ]
+    }`
+
+    const pathExample = `./public/data/challenges/${challengeId}/${
+      req.files["example"][0].path.split("/")[
+        req.files["example"][0].path.split("/").length - 1
+      ]
+    }`;
+    fs.renameSync(`./${req.files["example"][0].path}`, pathExample);
+
+    path.example = process.env.URL_PAGE +`/data/challenges/${challengeId}/${
+      req.files["example"][0].path.split("/")[
+        req.files["example"][0].path.split("/").length - 1
+      ]
+    }`
+    //...................//
+
 
     await Challenge.findByIdAndUpdate(
       challengeId,
@@ -313,7 +345,29 @@ exports.uploadPredictions = async (req, res, next) => {
           if ((baseValues[index] = modifyValues[index])) count++;
         }
 
-        res.send(count / baseValues.length);
+        let score = count / baseValues.length
+
+        await Challenge.findByIdAndUpdate(
+          challengeId,
+          {
+            $addToSet: {
+              ranking: {
+                userId: req.user._id,
+                username: req.user.username,
+                score,
+                date: new Date(),
+              },
+            },
+          },
+          function (err, updatedChallenge) {
+            if (err) throw err;
+            const challenge = updatedChallenge;
+            res.status(200).json({
+              data: challenge,
+              message: "Challenge has been updated",
+            });
+          }
+        );
       });
     });
   } catch (error) {

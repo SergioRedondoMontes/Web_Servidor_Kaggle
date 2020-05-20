@@ -59,7 +59,7 @@ router.get("/challenges/:challengeId", controllers.common.getChallenge);
 router.post(
   "/challenges",
   middleWares.auth.checkLoggedIn,
-  upload.fields([{ name: "competition" }, { name: "test_competition" }]),
+  upload.fields([{ name: "base" }, { name: "example" }]),
   controllers.common.postChallenge
 );
 
@@ -83,7 +83,12 @@ router.get("/signout", (req, res) => {
   res.redirect("/");
 });
 
-router.get("/uploadPredictions", controllers.common.uploadPredictions);
+router.get(
+  "/uploadPredictions",
+  middleWares.auth.checkLoggedIn,
+  upload.single({ name: "competition" }),
+  controllers.common.uploadPredictions
+);
 
 // router.post(
 //   "/testUpload",
