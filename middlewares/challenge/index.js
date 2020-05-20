@@ -19,20 +19,15 @@ exports.checkAccessActionChallenge = function (action) {
               permission = { granted: false };
             }
           } catch (error) {
-            return res.status(404).json({
-              error: "Not found",
-            });
+            res.redirect("/");
           }
         }
       }
       console.log(permission.granted);
       if (permission.granted) {
-        console.log("permision read own", permission);
         next();
       } else {
-        return res.status(401).json({
-          error: "You don't have enough permission to perform this action",
-        });
+        res.redirect("/");
       }
     } catch (error) {
       next(error);

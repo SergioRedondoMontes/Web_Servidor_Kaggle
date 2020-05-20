@@ -49,6 +49,18 @@ exports.checkAuthAdmin = function (req, res, next) {
   }
 };
 
+exports.checkAuthChallenger = function (req, res, next) {
+  if (req.user) {
+    if (req.user.role === "challenger") {
+      next();
+    } else {
+      res.redirect("/");
+    }
+  } else {
+    res.redirect("/");
+  }
+};
+
 exports.checkAuthStaff = function (req, res, next) {
   if (req.user) {
     if (req.user.role === "employee") {

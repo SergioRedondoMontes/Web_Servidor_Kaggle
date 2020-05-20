@@ -111,14 +111,15 @@ exports.postChallenge = async (req, res, next) => {
   console.log(req.body);
   //   res.send(req.files);
   try {
-    // console.log("body ,", JSON.parse(req));
-    const { title, description } = req.body;
+    const { title, description, dateStart, dateEnd } = req.body;
     const newChallenge = new Challenge({
       title,
       description,
       owner: req.user._id,
       participant: [],
       ranking: [],
+      dateStart: dateStart,
+      dateEnd: dateEnd,
       url_files: { base: "", example: "", dev: "", python: "" },
     });
 
@@ -144,24 +145,26 @@ exports.postChallenge = async (req, res, next) => {
         ]
       }`;
 
+    let filename = new Date().getTime();
+
     // CREATE DEV CSV
     DataFrame.fromCSV(paths.base)
       .then((df) => {
         let df1 = df.drop(df.listColumns()[df.listColumns().length - 1]);
-        let filename = new Date().getTime();
+
         df1.toCSV(
           true,
           `./public/data/challenges/${challengeId}/` + filename + ".csv"
         );
-        paths.dev =
-          process.env.URL_PAGE +
-          `/data/challenges/${challengeId}/` +
-          filename +
-          ".csv";
       })
       .catch((err) => {
         console.log(err);
       });
+    paths.dev =
+      process.env.URL_PAGE +
+      `/data/challenges/${challengeId}/` +
+      filename +
+      ".csv";
 
     // CREATE EXAMPLE CSV
     const pathExample = `./public/data/challenges/${challengeId}/${
@@ -186,27 +189,47 @@ exports.postChallenge = async (req, res, next) => {
       function (err, updatedChallenge) {
         if (err) throw err;
         const challenge = updatedChallenge;
-        res.status(200).json({
-          data: challenge,
-          message: "Challenge has been updated",
-        });
+        res.redirect(`/challenges/${challengeId}/edit`);
       }
     );
-
-    // res.send("gola");
   } catch (error) {
-    res.send(error);
-    // res.send("que lo que");
-    return;
+    next(error);
+  }
+};
+
+exports.getMyChallenges = async (req, res, next) => {
+  try {
+    const challenges = await Challenge.find({ owner: req.user._id });
+    res.render("common/mychallenges", {
+      challenges: challenges,
+      appUser: req.user || null,
+      loggedIn: req.user ? true : false,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
 exports.getChallenges = async (req, res, next) => {
   try {
-    console.log("entrooooo");
     const challenges = await Challenge.find({});
     res.render("common/home", {
       challenges: challenges,
+      appUser: req.user || null,
+      loggedIn: req.user ? true : false,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getMyChallenge = async (req, res, next) => {
+  try {
+    const challengeId = req.params.challengeId;
+    const challenge = await Challenge.findById(challengeId);
+    if (!challenge) return next(new Error("Challenge does not exist"));
+    res.render("common/challengeEdit", {
+      challenge: challenge,
       appUser: req.user || null,
       loggedIn: req.user ? true : false,
     });
@@ -236,10 +259,7 @@ exports.updateChallenge = async (req, res, next) => {
     const challengeId = req.params.challengeId;
     await Challenge.findByIdAndUpdate(challengeId, update);
     const challenge = await Challenge.findById(challengeId);
-    res.status(200).json({
-      data: challenge,
-      message: "Challenge has been updated",
-    });
+    res.redirect(`/challenges/${challenge._id}/edit`);
   } catch (error) {
     next(error);
   }
@@ -317,10 +337,7 @@ exports.deleteChallenge = async (req, res, next) => {
   try {
     const challengeId = req.params.challengeId;
     await Challenge.findByIdAndDelete(challengeId);
-    res.status(200).json({
-      data: null,
-      message: "Challenge has been deleted",
-    });
+    res.redirect("/challenges");
   } catch (error) {
     next(error);
   }

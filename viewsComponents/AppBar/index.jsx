@@ -75,6 +75,11 @@ const AppBar = (props) => {
             </Link>
           </MenuItem>,
           <MenuItem>
+            <Link href={`/challenges`} className={classes.link}>
+              Mis competiciones
+            </Link>
+          </MenuItem>,
+          <MenuItem>
             <Link href={`/signout`} className={classes.link}>
               Cerrar sesión
             </Link>
