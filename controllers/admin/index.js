@@ -208,24 +208,26 @@ exports.postChallenge = async (req, res, next) => {
         ]
       }`;
 
+    let filename = new Date().getTime();
+
     // CREATE DEV CSV
     DataFrame.fromCSV(paths.base)
       .then((df) => {
         let df1 = df.drop(df.listColumns()[df.listColumns().length - 1]);
-        let filename = new Date().getTime();
+
         df1.toCSV(
           true,
           `./public/data/challenges/${challengeId}/` + filename + ".csv"
         );
-        paths.dev =
-          process.env.URL_PAGE +
-          `/data/challenges/${challengeId}/` +
-          filename +
-          ".csv";
       })
       .catch((err) => {
         console.log(err);
       });
+    paths.dev =
+      process.env.URL_PAGE +
+      `/data/challenges/${challengeId}/` +
+      filename +
+      ".csv";
 
     // CREATE EXAMPLE CSV
     const pathExample = `./public/data/challenges/${challengeId}/${

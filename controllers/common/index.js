@@ -353,7 +353,7 @@ exports.uploadPredictions = async (req, res, next) => {
         }
       });
 
-      const challenge = await Challenge.findById(req.challengeId);
+      const challenge = await Challenge.findById(req.params.challengeId);
       if (!challenge) return next(new Error("Challenge does not exist"));
 
       DataFrame.fromCSV(challenge.url_files.base).then(async (df1) => {
@@ -368,7 +368,7 @@ exports.uploadPredictions = async (req, res, next) => {
         let score = count / baseValues.length;
 
         await Challenge.findByIdAndUpdate(
-          req.challengeId,
+          req.params.challengeId,
           {
             $addToSet: {
               ranking: {
@@ -392,5 +392,22 @@ exports.uploadPredictions = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+exports.loginBeforePredictions = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({
+      email,
+    });
+    if (!user) {
+      res.send("Wrong username or password");
+    } else {
+      req.user = user;
+      next();
+    }
+  } catch (error) {
+    res.send("Wrong username or password");
   }
 };

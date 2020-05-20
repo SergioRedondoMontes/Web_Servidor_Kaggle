@@ -184,14 +184,26 @@ const Challenge = (props) => {
   };
   const donwloadZip = () => {
     const zip = new JSZip();
-    [challenge.url_files.example, challenge.url_files.dev].forEach(
-      (file, index) => {
-        const filename = `file${index}.${
-          file.split(".")[file.split(".").length - 1]
-        }`;
-        zip.file(filename, urlToPromise(file), { binary: true });
-      }
-    );
+
+    // EXAMPLE
+    const filenameExample = `example.${
+      challenge.url_files.example.split(".")[
+        challenge.url_files.example.split(".").length - 1
+      ]
+    }`;
+    zip.file(filenameExample, urlToPromise(challenge.url_files.example), {
+      binary: true,
+    });
+    // DEV
+    const filenameDev = `dev.${
+      challenge.url_files.dev.split(".")[
+        challenge.url_files.dev.split(".").length - 1
+      ]
+    }`;
+    zip.file(filenameDev, urlToPromise(challenge.url_files.dev), {
+      binary: true,
+    });
+    // TODO PYTHON FILE
     zip.generateAsync({ type: "blob" }).then(function (content) {
       FileSaver.saveAs(content, "competicion.zip");
     });

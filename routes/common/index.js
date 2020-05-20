@@ -85,10 +85,10 @@ router.get("/signout", (req, res) => {
   res.redirect("/");
 });
 
-router.get(
-  "/uploadPredictions",
-  middleWares.auth.checkLoggedIn,
+router.post(
+  "challenges/:challengeId/uploadPredictions",
   upload.single({ name: "competition" }),
+  controllers.common.loginBeforePredictions,
   controllers.common.uploadPredictions
 );
 
