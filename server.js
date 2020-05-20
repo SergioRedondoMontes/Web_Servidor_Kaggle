@@ -1,6 +1,8 @@
 // server/server.js
 const express = require("express");
 const mongoose = require("mongoose");
+const CONNECTION_URI =
+  process.env.MONGODB_URI || "mongodb://localhost:27017/rbac";
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const path = require("path");
@@ -23,7 +25,7 @@ const app = express();
   });
   const PORT = process.env.PORT || 3000;
 
-  mongoose.connect("mongodb://localhost:27017/rbac").then(() => {
+  mongoose.connect(CONNECTION_URI).then(() => {
     console.log("Connected to the Database successfully");
   });
 
@@ -72,7 +74,7 @@ const app = express();
   });
 
   app.use("/", routes);
-  app.listen(PORT || 3000, () => {
+  app.listen(PORT, () => {
     console.log("Server is listening on Port:", PORT);
   });
 })();
