@@ -39,18 +39,17 @@ router.get(
   middleWares.auth.checkLoggedIn,
   middleWares.auth.checkAuthAdmin,
   (req, res) => {
-    res.redirect("/admin/home");
+    res.redirect("/admin/dashboard");
   }
 );
 
 router.get(
-  "/home",
+  "/dashboard",
   middleWares.auth.checkLoggedIn,
   middleWares.auth.checkAuthAdmin,
-  (req, res) => {
-    res.send("esto funciona porque estas logged in");
-  }
+  controllers.admin.getDashboard
 );
+
 router.get("/login", (req, res) => {
   res.render("admin/login");
 });

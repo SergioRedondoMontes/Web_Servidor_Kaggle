@@ -305,3 +305,18 @@ exports.deleteChallenge = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getDashboard = async (req, res, next) => {
+  try {
+    const challenges = await Challenge.find({});
+    const users = await User.find({});
+    res.render("admin/dashboard", {
+      challenges,
+      users,
+      appUser: res.locals.loggedInUser || null,
+      loggedIn: true,
+    });
+  } catch (error) {
+    res.redirect("/");
+  }
+};

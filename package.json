@@ -43,6 +43,7 @@
     "mui-datatables": "^2.14.0",
     "multer": "^1.4.2",
     "react": "^16.13.1",
+    "react-countup": "^4.3.3",
     "react-dom": "^16.13.1",
     "react-helmet": "^6.0.0"
   },

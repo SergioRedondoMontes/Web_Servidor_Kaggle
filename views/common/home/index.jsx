@@ -17,6 +17,7 @@ import { AppBar } from "../../../viewsComponents/AppBar";
 import { Card } from "../../../viewsComponents/Card";
 
 import { Helmet } from "react-helmet";
+import { Zoom } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -67,9 +68,11 @@ const Home = (props) => {
       <Grid item xs={10} className={classes.content}>
         <Grid container spacing={2}>
           {props.challenges.map((challenge, index) => (
-            <Grid item xs={12} md={4}>
-              <Card challenge={challenge} index={index} />
-            </Grid>
+            <Zoom in={true} style={{ transitionDelay: index * 200 + "ms" }}>
+              <Grid item xs={12} md={4}>
+                <Card challenge={challenge} index={index} />
+              </Grid>
+            </Zoom>
           ))}
         </Grid>
       </Grid>
