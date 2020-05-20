@@ -339,57 +339,62 @@ exports.deleteChallenge = async (req, res, next) => {
 
 exports.uploadPredictions = async (req, res, next) => {
   try {
-    DataFrame.fromCSV(req.file).then(async (df) => {
-      const baseValues = df
-        .select(df.listColumns()[df.listColumns().length - 1])
-        .toArray();
-      let count;
-
-      df.withColumn(df.listColumns()[df.listColumns().length - 1], (row, j) => {
-        if (baseValues[j][0] < 0.5) {
-          return 0;
-        } else {
-          return 1;
-        }
-      });
-
-      const challenge = await Challenge.findById(req.params.challengeId);
-      if (!challenge) return next(new Error("Challenge does not exist"));
-
-      DataFrame.fromCSV(challenge.url_files.base).then(async (df1) => {
-        let modifyValues = df1
-          .select(df1.listColumns()[df1.listColumns().length - 1])
+    DataFrame.fromCSV(process.env.URL_PAGE + "/tmp/" + req.file.filename).then(
+      async (df) => {
+        const baseValues = df
+          .select(df.listColumns()[df.listColumns().length - 1])
           .toArray();
+        let count = 0;
 
-        for (let index = 0; index < baseValues.length; index++) {
-          if ((baseValues[index] = modifyValues[index])) count++;
-        }
-
-        let score = count / baseValues.length;
-
-        await Challenge.findByIdAndUpdate(
-          req.params.challengeId,
-          {
-            $addToSet: {
-              ranking: {
-                userId: req.user._id,
-                username: req.user.username,
-                score,
-                date: new Date(),
-              },
-            },
-          },
-          function (err, updatedChallenge) {
-            if (err) throw err;
-            const challenge = updatedChallenge;
-            res.status(200).json({
-              data: challenge,
-              message: "Challenge has been updated",
-            });
+        df.withColumn(
+          df.listColumns()[df.listColumns().length - 1],
+          (row, j) => {
+            if (baseValues[j][0] < 0.5) {
+              return 0;
+            } else {
+              return 1;
+            }
           }
         );
-      });
-    });
+
+        const challenge = await Challenge.findById(req.params.challengeId);
+        if (!challenge) return next(new Error("Challenge does not exist"));
+
+        DataFrame.fromCSV(challenge.url_files.base).then(async (df1) => {
+          let modifyValues = df1
+            .select(df1.listColumns()[df1.listColumns().length - 1])
+            .toArray();
+
+          for (let index = 0; index < baseValues.length; index++) {
+            if ((baseValues[index] = modifyValues[index])) count++;
+          }
+
+          let score = count / baseValues.length;
+
+          await Challenge.findByIdAndUpdate(
+            req.params.challengeId,
+            {
+              $addToSet: {
+                ranking: {
+                  userId: req.user._id,
+                  username: req.user.username,
+                  score,
+                  date: new Date(),
+                },
+              },
+            },
+            function (err, updatedChallenge) {
+              if (err) throw err;
+              const challenge = updatedChallenge;
+              res.status(200).json({
+                data: challenge,
+                message: "Challenge has been updated",
+              });
+            }
+          );
+        });
+      }
+    );
   } catch (error) {
     next(error);
   }

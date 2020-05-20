@@ -86,8 +86,8 @@ router.get("/signout", (req, res) => {
 });
 
 router.post(
-  "challenges/:challengeId/uploadPredictions",
-  upload.single({ name: "competition" }),
+  "/challenges/:challengeId/uploadPredictions",
+  upload.single("competition"),
   controllers.common.loginBeforePredictions,
   controllers.common.uploadPredictions
 );
