@@ -140,30 +140,16 @@ exports.postChallenge = async (req, res, next) => {
     fs.mkdirSync(`./public/data/challenges/${challengeId}/`);
     const paths = { base: "", example: "", dev: "", python: "" };
 
-    DataFrame.fromCSV(req.file["base"][0].path).then((df) => {
-      let df1 = df.drop(df1.listColumns()[df.listColumns().length]);
-      //TODO: Cambiar url donde guardar
-      let filename = new Date().getTime();
-      df1.toCSV(
-        true,
-        `./public/data/challenges/${challengeId}/` + filename + ".csv"
-      );
-      path.dev =
-        process.env.URL_PAGE +
-        `/data/challenges/${challengeId}/` +
-        filename +
-        ".csv";
-    });
-
+    // CREATE BASE CSV
     const pathBase = `./public/data/challenges/${challengeId}/${
       req.files["base"][0].path.split("/")[
         req.files["base"][0].path.split("/").length - 1
       ]
     }`;
 
-    fs.renameSync(`./${req.file["base"][0].path}`, pathBase);
+    fs.renameSync(`./${req.files["base"][0].path}`, pathBase);
 
-    path.base =
+    paths.base =
       process.env.URL_PAGE +
       `/data/challenges/${challengeId}/${
         req.files["base"][0].path.split("/")[
@@ -171,6 +157,26 @@ exports.postChallenge = async (req, res, next) => {
         ]
       }`;
 
+    // CREATE DEV CSV
+    DataFrame.fromCSV(paths.base)
+      .then((df) => {
+        let df1 = df.drop(df.listColumns()[df.listColumns().length - 1]);
+        let filename = new Date().getTime();
+        df1.toCSV(
+          true,
+          `./public/data/challenges/${challengeId}/` + filename + ".csv"
+        );
+        paths.dev =
+          process.env.URL_PAGE +
+          `/data/challenges/${challengeId}/` +
+          filename +
+          ".csv";
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    // CREATE EXAMPLE CSV
     const pathExample = `./public/data/challenges/${challengeId}/${
       req.files["example"][0].path.split("/")[
         req.files["example"][0].path.split("/").length - 1
@@ -178,13 +184,15 @@ exports.postChallenge = async (req, res, next) => {
     }`;
     fs.renameSync(`./${req.files["example"][0].path}`, pathExample);
 
-    path.example =
+    paths.example =
       process.env.URL_PAGE +
       `/data/challenges/${challengeId}/${
         req.files["example"][0].path.split("/")[
           req.files["example"][0].path.split("/").length - 1
         ]
       }`;
+
+    // TODO PYTHON FILE
 
     await Challenge.findByIdAndUpdate(
       challengeId,

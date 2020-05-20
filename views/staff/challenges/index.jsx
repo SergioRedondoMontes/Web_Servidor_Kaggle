@@ -293,13 +293,13 @@ const ChallengesStaff = (props) => {
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body1">
-                  Fichero de la competición
+                  Fichero base de la competición
                 </Typography>
-                <input type="file" name="competition" />
+                <input type="file" name="base" />
                 <Typography variant="body1">
-                  Fichero 2 de la competición
+                  Fichero ejemplo de la competición
                 </Typography>
-                <input type="file" name="test_competition" />
+                <input type="file" name="example" />
               </Grid>
               <Grid item xs={12}>
                 <Button
