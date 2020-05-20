@@ -37,8 +37,8 @@ exports.signup = async (req, res, next) => {
     );
     newUser.accessToken = accessToken;
     await newUser.save();
-    res.send("entro");
     res.cookie("authorization-kaggle", accessToken);
+    res.redirect("/");
     // res.redirect("/");
   } catch (error) {
     res.render("common/signup", {
@@ -133,21 +133,25 @@ exports.postChallenge = async (req, res, next) => {
       url_files: { base: "", example: "", dev: "", python: "" },
     });
 
-
     await newChallenge.save();
     const challengeId = newChallenge._id;
     fs.mkdirSync(`./public/data/challenges/${challengeId}/`);
     const paths = { base: "", example: "", dev: "", python: "" };
 
-    DataFrame.fromCSV(
-      req.file["base"][0].path
-    ).then((df) => {
-      let df1 = df.drop(df1.listColumns()[df.listColumns().length])
+    DataFrame.fromCSV(req.file["base"][0].path).then((df) => {
+      let df1 = df.drop(df1.listColumns()[df.listColumns().length]);
       //TODO: Cambiar url donde guardar
-      let filename = new Date().getTime()
-      df1.toCSV(true, `./public/data/challenges/${challengeId}/` + filename + '.csv')
-      path.dev = process.env.URL_PAGE +`/data/challenges/${challengeId}/` + filename + '.csv'
-    })
+      let filename = new Date().getTime();
+      df1.toCSV(
+        true,
+        `./public/data/challenges/${challengeId}/` + filename + ".csv"
+      );
+      path.dev =
+        process.env.URL_PAGE +
+        `/data/challenges/${challengeId}/` +
+        filename +
+        ".csv";
+    });
 
     const pathBase = `./public/data/challenges/${challengeId}/${
       req.files["base"][0].path.split("/")[
@@ -155,14 +159,15 @@ exports.postChallenge = async (req, res, next) => {
       ]
     }`;
 
-
     fs.renameSync(`./${req.file["base"][0].path}`, pathBase);
 
-    path.base = process.env.URL_PAGE +`/data/challenges/${challengeId}/${
-      req.files["base"][0].path.split("/")[
-        req.files["base"][0].path.split("/").length - 1
-      ]
-    }`
+    path.base =
+      process.env.URL_PAGE +
+      `/data/challenges/${challengeId}/${
+        req.files["base"][0].path.split("/")[
+          req.files["base"][0].path.split("/").length - 1
+        ]
+      }`;
 
     const pathExample = `./public/data/challenges/${challengeId}/${
       req.files["example"][0].path.split("/")[
@@ -171,11 +176,13 @@ exports.postChallenge = async (req, res, next) => {
     }`;
     fs.renameSync(`./${req.files["example"][0].path}`, pathExample);
 
-    path.example = process.env.URL_PAGE +`/data/challenges/${challengeId}/${
-      req.files["example"][0].path.split("/")[
-        req.files["example"][0].path.split("/").length - 1
-      ]
-    }`
+    path.example =
+      process.env.URL_PAGE +
+      `/data/challenges/${challengeId}/${
+        req.files["example"][0].path.split("/")[
+          req.files["example"][0].path.split("/").length - 1
+        ]
+      }`;
 
     await Challenge.findByIdAndUpdate(
       challengeId,
@@ -325,8 +332,10 @@ exports.deleteChallenge = async (req, res, next) => {
 
 exports.uploadPredictions = async (req, res, next) => {
   try {
-    DataFrame.fromCSV(req.file).then((df) => {
-      const baseValues = df.select(df.listColumns()[df.listColumns().length]).toArray();
+    DataFrame.fromCSV(req.file).then(async (df) => {
+      const baseValues = df
+        .select(df.listColumns()[df.listColumns().length])
+        .toArray();
       let count;
 
       df.withColumn(df.listColumns()[df.listColumns().length], (row, j) => {
@@ -339,17 +348,17 @@ exports.uploadPredictions = async (req, res, next) => {
 
       const challenge = await Challenge.findById(challengeId);
       if (!challenge) return next(new Error("Challenge does not exist"));
-        
-      DataFrame.fromCSV(
-        challenge.url_files.base
-      ).then((df1) => {
-        let modifyValues = df1.select(df1.listColumns()[df1.listColumns().length]).toArray();
+
+      DataFrame.fromCSV(challenge.url_files.base).then(async (df1) => {
+        let modifyValues = df1
+          .select(df1.listColumns()[df1.listColumns().length])
+          .toArray();
 
         for (let index = 0; index < baseValues.length; index++) {
           if ((baseValues[index] = modifyValues[index])) count++;
         }
 
-        let score = count / baseValues.length
+        let score = count / baseValues.length;
 
         await Challenge.findByIdAndUpdate(
           challengeId,
