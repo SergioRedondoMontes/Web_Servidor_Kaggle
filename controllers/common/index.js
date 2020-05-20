@@ -130,12 +130,13 @@ exports.postChallenge = async (req, res, next) => {
       owner: req.user._id,
       participant: [],
       ranking: [],
-      url_files: [],
+      url_files: { base: "", example: "", dev: "", python: "" },
     });
     await newChallenge.save();
     const challengeId = newChallenge._id;
     fs.mkdirSync(`./public/challenges/${challengeId}/`);
     const paths = [];
+    //TODO: CAMBIAR EL INSERTAR DE UN ARRAY A LOS OBJETOS CORRESPONDIENTES
     Object.keys(req.files).forEach((file, index) => {
       const path = `./public/challenges/${challengeId}/${
         req.files[file][0].path.split("/")[
@@ -288,13 +289,11 @@ exports.deleteChallenge = async (req, res, next) => {
 
 exports.uploadPredictions = async (req, res, next) => {
   try {
-    DataFrame.fromCSV(
-      "/Users/sergioredondo/Desktop/UTAD/U-TAD_Alumno/3_Tercero/WebServidor/trabajo_final/Web_Servidor_Kaggle/public/challenges/challenge_prueba_profe/dev.csv"
-    ).then((df) => {
-      const baseValues = df.select("pred").toArray();
+    DataFrame.fromCSV(req.file).then((df) => {
+      const baseValues = df.select(df.listColumns()[df.listColumns().length]).toArray();
       let count;
 
-      df.withColumn("pred", (row, j) => {
+      df.withColumn(df.listColumns()[df.listColumns().length], (row, j) => {
         if (baseValues[j][0] < 0.5) {
           return 0;
         } else {
@@ -302,13 +301,20 @@ exports.uploadPredictions = async (req, res, next) => {
         }
       });
 
-      let modifyValues = df.select("real").toArray();
+      const challenge = await Challenge.findById(challengeId);
+      if (!challenge) return next(new Error("Challenge does not exist"));
+        
+      DataFrame.fromCSV(
+        challenge.url_files.base
+      ).then((df1) => {
+        let modifyValues = df1.select(df1.listColumns()[df1.listColumns().length]).toArray();
 
-      for (let index = 0; index < baseValues.length; index++) {
-        if ((baseValues[index] = modifyValues[index])) count++;
-      }
+        for (let index = 0; index < baseValues.length; index++) {
+          if ((baseValues[index] = modifyValues[index])) count++;
+        }
 
-      res.send(count / baseValues.length);
+        res.send(count / baseValues.length);
+      });
     });
   } catch (error) {
     next(error);
