@@ -56,10 +56,7 @@ const AppBar = (props) => {
       case "player":
         return [
           <MenuItem>
-            <Link
-              href={`/users/${props.user ? props.user._id : null}`}
-              className={classes.link}
-            >
+            <Link href={`/profile`} className={classes.link}>
               Mi perfil
             </Link>
           </MenuItem>,
@@ -73,10 +70,7 @@ const AppBar = (props) => {
       case "challenger":
         return [
           <MenuItem>
-            <Link
-              href={`/users/${props.user ? props.user._id : null}`}
-              className={classes.link}
-            >
+            <Link href={`/profile`} className={classes.link}>
               Mi perfil
             </Link>
           </MenuItem>,

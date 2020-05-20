@@ -43,12 +43,23 @@ router.get(
   middleWares.auth.checkExistsLoggedIn,
   controllers.common.getChallenges
 );
+router.get(
+  "/profile",
+  middleWares.auth.checkLoggedIn,
+  controllers.common.getProfile
+);
 
-router.get("/users/:userId", controllers.common.getUser);
+router.post(
+  "/profile",
+  middleWares.auth.checkLoggedIn,
+  controllers.common.updateUser
+);
 
-router.put("/users/:userId", controllers.common.updateUser);
-
-router.delete("/users/:userId", controllers.common.deleteUser);
+router.get(
+  "/profile/delete",
+  middleWares.auth.checkLoggedIn,
+  controllers.common.deleteUser
+);
 
 router.get("/challenges", controllers.common.getChallenges);
 

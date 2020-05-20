@@ -77,29 +77,21 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.getUser = async (req, res, next) => {
-  try {
-    const userId = req.params.userId;
-    const user = await User.findById(userId);
-    if (!user) return next(new Error("User does not exist"));
-    res.status(200).json({
-      data: user,
-    });
-  } catch (error) {
-    next(error);
-  }
+exports.getProfile = async (req, res, next) => {
+  res.render("common/profile", {
+    user: req.user,
+    appUser: req.user || null,
+    loggedIn: req.user ? true : false,
+  });
 };
 
 exports.updateUser = async (req, res, next) => {
   try {
     const update = req.body;
-    const userId = req.params.userId;
+    const userId = req.user._id;
     await User.findByIdAndUpdate(userId, update);
     const user = await User.findById(userId);
-    res.status(200).json({
-      data: user,
-      message: "User has been updated",
-    });
+    res.redirect("/profile");
   } catch (error) {
     next(error);
   }
@@ -107,12 +99,9 @@ exports.updateUser = async (req, res, next) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.user._id;
     await User.findByIdAndDelete(userId);
-    res.status(200).json({
-      data: null,
-      message: "User has been deleted",
-    });
+    res.redirect("/signout");
   } catch (error) {
     next(error);
   }
