@@ -41,12 +41,10 @@ exports.signup = async (req, res, next) => {
     res.cookie("authorization-kaggle", accessToken);
     // res.redirect("/");
   } catch (error) {
-    console.log(error);
-    res.send(error);
-    // res.render("common/signup", {
-    //   alert: "email-exists",
-    //   user: { username, name, surname, email, role },
-    // });
+    res.render("common/signup", {
+      alert: "email-exists",
+      user: { username, name, surname, email, role },
+    });
 
     // res.render("common/signup");
   }
