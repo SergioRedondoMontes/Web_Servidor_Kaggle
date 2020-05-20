@@ -150,18 +150,6 @@ router.get(
   controllers.staff.deleteChallenge
 );
 
-router.put(
-  "/challenges/:challengeId/participants",
-  middleWares.auth.checkLoggedIn,
-  controllers.staff.updateParticipants
-);
-
-router.put(
-  "/challenges/:challengeId/ranking",
-  middleWares.auth.checkLoggedIn,
-  controllers.staff.updateRanking
-);
-
 // END CHALLENGE ROUTES
 
 module.exports = router;

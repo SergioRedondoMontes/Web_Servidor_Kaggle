@@ -141,20 +141,6 @@ router.post(
   controllers.admin.updateChallenge
 );
 
-router.put(
-  "/challenges/:challengeId/participants",
-  middleWares.auth.checkLoggedIn,
-  middleWares.auth.checkAuthAdmin,
-  controllers.admin.updateParticipants
-);
-
-router.put(
-  "/challenges/:challengeId/ranking",
-  middleWares.auth.checkLoggedIn,
-  middleWares.auth.checkAuthAdmin,
-  controllers.admin.updateRanking
-);
-
 router.get(
   "/challenges/:challengeId/delete",
   middleWares.auth.checkLoggedIn,
