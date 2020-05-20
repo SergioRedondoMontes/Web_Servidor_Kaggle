@@ -277,15 +277,15 @@ exports.updateParticipants = async (req, res, next) => {
         },
         function (err, updatedChallenge) {
           if (err) throw err;
-          const challenge = updatedChallenge;
-          res.render("common/challenge", {
-            challenge: challenge,
-            appUser: req.user || null,
-            loggedIn: req.user ? true : false,
-            alert: "participant-added",
-          });
         }
       );
+      const challenge = await Challenge.findById(challengeId);
+      res.render("common/challenge", {
+        challenge: challenge,
+        appUser: req.user || null,
+        loggedIn: req.user ? true : false,
+        alert: "participant-added",
+      });
     } else {
       res.redirect("/");
     }
