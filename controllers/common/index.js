@@ -67,10 +67,10 @@ exports.login = async (req, res, next) => {
     });
     await User.findByIdAndUpdate(user._id, { accessToken });
     res.cookie("authorization-kaggle", accessToken);
-    if (!user.restPassword) {
+    if (!user.resetPassword) {
       res.redirect("/");
     } else {
-      //TODO: render form change password / updateUser()
+      res.render("common/login", { form: "reset-password" });
     }
   } catch (error) {
     res.render("common/login");
@@ -89,6 +89,9 @@ exports.updateUser = async (req, res, next) => {
   try {
     const update = req.body;
     const userId = req.user._id;
+    if (update.password) {
+      update.password = await hashPassword(update.password);
+    }
     await User.findByIdAndUpdate(userId, update);
     const user = await User.findById(userId);
     res.redirect("/profile");

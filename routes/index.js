@@ -8,11 +8,13 @@ const router = express.Router();
 const common = require("./common");
 const admin = require("./admin");
 const staff = require("./staff");
+const start = require("./start");
 
 // NOT LOGGED IN VIEWS
 router.use("/", common);
 router.use("/admin", admin);
 router.use("/staff", staff);
+router.use("/start", start);
 
 //Users routes
 // router.get(
