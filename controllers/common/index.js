@@ -341,11 +341,11 @@ exports.uploadPredictions = async (req, res, next) => {
   try {
     DataFrame.fromCSV(req.file).then(async (df) => {
       const baseValues = df
-        .select(df.listColumns()[df.listColumns().length])
+        .select(df.listColumns()[df.listColumns().length - 1])
         .toArray();
       let count;
 
-      df.withColumn(df.listColumns()[df.listColumns().length], (row, j) => {
+      df.withColumn(df.listColumns()[df.listColumns().length - 1], (row, j) => {
         if (baseValues[j][0] < 0.5) {
           return 0;
         } else {
@@ -358,7 +358,7 @@ exports.uploadPredictions = async (req, res, next) => {
 
       DataFrame.fromCSV(challenge.url_files.base).then(async (df1) => {
         let modifyValues = df1
-          .select(df1.listColumns()[df1.listColumns().length])
+          .select(df1.listColumns()[df1.listColumns().length - 1])
           .toArray();
 
         for (let index = 0; index < baseValues.length; index++) {
