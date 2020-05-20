@@ -54,7 +54,20 @@ const ChallengeSchema = new Schema(
         },
       },
     ],
-    url_files: [String],
+    url_files: {
+      base: {
+        type: String,
+      },
+      example: {
+        type: String,
+      },
+      dev: {
+        type: String,
+      },
+      python: {
+        type: String,
+      },
+    },
   },
   {
     timestamps: {

@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { roles } = require("../../roles");
 const fs = require("fs");
+const DataFrame = require("dataframe-js").DataFrame;
 
 async function hashPassword(password) {
   return await bcrypt.hash(password, 10);
@@ -129,27 +130,55 @@ exports.postChallenge = async (req, res, next) => {
       owner: req.user._id,
       participant: [],
       ranking: [],
-      url_files: [],
+      url_files: { base: "", example: "", dev: "", python: "" },
     });
+
+
     await newChallenge.save();
     const challengeId = newChallenge._id;
     fs.mkdirSync(`./public/data/challenges/${challengeId}/`);
-    const paths = [];
-    Object.keys(req.files).forEach((file, index) => {
-      const path = `./public/data/challenges/${challengeId}/${
-        req.files[file][0].path.split("/")[
-          req.files[file][0].path.split("/").length - 1
-        ]
-      }`;
-      fs.renameSync(`./${req.files[file][0].path}`, path);
+    const paths = { base: "", example: req.file["example"][0].path, dev: "", python: "" };
+    //TODO: CAMBIAR EL INSERTAR DE UN ARRAY A LOS OBJETOS CORRESPONDIENTES
+    //...................//
+    DataFrame.fromCSV(
+      req.file["base"][0].path
+    ).then((df) => {
+      let df1 = df.drop(df1.listColumns()[df.listColumns().length])
+      //TODO: Cambiar url donde guardar
+      let filename = new Date().getTime()
+      df1.toCSV(true, `./public/data/challenges/${challengeId}/` + filename + '.csv')
+      path.dev = process.env.URL_PAGE +`/data/challenges/${challengeId}/` + filename + '.csv'
+    })
 
-      const urlPath = `${process.env.URL_PAGE}/data/challenges/${challengeId}/${
-        req.files[file][0].path.split("/")[
-          req.files[file][0].path.split("/").length - 1
-        ]
-      }`;
-      paths.push(urlPath);
-    });
+    const pathBase = `./public/data/challenges/${challengeId}/${
+      req.files["base"][0].path.split("/")[
+        req.files["base"][0].path.split("/").length - 1
+      ]
+    }`;
+
+
+    fs.renameSync(`./${req.file["base"][0].path}`, pathBase);
+
+    path.base = process.env.URL_PAGE +`/data/challenges/${challengeId}/${
+      req.files["base"][0].path.split("/")[
+        req.files["base"][0].path.split("/").length - 1
+      ]
+    }`
+
+    const pathExample = `./public/data/challenges/${challengeId}/${
+      req.files["example"][0].path.split("/")[
+        req.files["example"][0].path.split("/").length - 1
+      ]
+    }`;
+    fs.renameSync(`./${req.files["example"][0].path}`, pathExample);
+
+    path.example = process.env.URL_PAGE +`/data/challenges/${challengeId}/${
+      req.files["example"][0].path.split("/")[
+        req.files["example"][0].path.split("/").length - 1
+      ]
+    }`
+    //...................//
+
 
     await Challenge.findByIdAndUpdate(
       challengeId,
@@ -291,6 +320,62 @@ exports.deleteChallenge = async (req, res, next) => {
     res.status(200).json({
       data: null,
       message: "Challenge has been deleted",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.uploadPredictions = async (req, res, next) => {
+  try {
+    DataFrame.fromCSV(req.file).then((df) => {
+      const baseValues = df.select(df.listColumns()[df.listColumns().length]).toArray();
+      let count;
+
+      df.withColumn(df.listColumns()[df.listColumns().length], (row, j) => {
+        if (baseValues[j][0] < 0.5) {
+          return 0;
+        } else {
+          return 1;
+        }
+      });
+
+      const challenge = await Challenge.findById(challengeId);
+      if (!challenge) return next(new Error("Challenge does not exist"));
+        
+      DataFrame.fromCSV(
+        challenge.url_files.base
+      ).then((df1) => {
+        let modifyValues = df1.select(df1.listColumns()[df1.listColumns().length]).toArray();
+
+        for (let index = 0; index < baseValues.length; index++) {
+          if ((baseValues[index] = modifyValues[index])) count++;
+        }
+
+        let score = count / baseValues.length
+
+        await Challenge.findByIdAndUpdate(
+          challengeId,
+          {
+            $addToSet: {
+              ranking: {
+                userId: req.user._id,
+                username: req.user.username,
+                score,
+                date: new Date(),
+              },
+            },
+          },
+          function (err, updatedChallenge) {
+            if (err) throw err;
+            const challenge = updatedChallenge;
+            res.status(200).json({
+              data: challenge,
+              message: "Challenge has been updated",
+            });
+          }
+        );
+      });
     });
   } catch (error) {
     next(error);
