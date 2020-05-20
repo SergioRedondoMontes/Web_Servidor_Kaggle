@@ -137,9 +137,8 @@ exports.postChallenge = async (req, res, next) => {
     await newChallenge.save();
     const challengeId = newChallenge._id;
     fs.mkdirSync(`./public/data/challenges/${challengeId}/`);
-    const paths = { base: "", example: req.file["example"][0].path, dev: "", python: "" };
-    //TODO: CAMBIAR EL INSERTAR DE UN ARRAY A LOS OBJETOS CORRESPONDIENTES
-    //...................//
+    const paths = { base: "", example: "", dev: "", python: "" };
+
     DataFrame.fromCSV(
       req.file["base"][0].path
     ).then((df) => {
@@ -177,8 +176,6 @@ exports.postChallenge = async (req, res, next) => {
         req.files["example"][0].path.split("/").length - 1
       ]
     }`
-    //...................//
-
 
     await Challenge.findByIdAndUpdate(
       challengeId,

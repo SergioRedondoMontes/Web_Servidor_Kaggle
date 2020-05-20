@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const { roles } = require("../../roles");
 const staffControllers = require("../staff");
 const fs = require("fs");
+const DataFrame = require("dataframe-js").DataFrame;
 
 async function hashPassword(password) {
   return await bcrypt.hash(password, 10);
@@ -181,27 +182,59 @@ exports.postChallenge = async (req, res, next) => {
       ranking: [],
       dateStart: dateStart,
       dateEnd: dateEnd,
-      url_files: ["url1", "url2"],
+      url_files: { base: "", example: "", dev: "", python: "" },
     });
+
     await newChallenge.save();
     const challengeId = newChallenge._id;
     fs.mkdirSync(`./public/data/challenges/${challengeId}/`);
-    const paths = [];
-    Object.keys(req.files).forEach((file, index) => {
-      const path = `./public/data/challenges/${challengeId}/${
-        req.files[file][0].path.split("/")[
-          req.files[file][0].path.split("/").length - 1
-        ]
-      }`;
-      fs.renameSync(`./${req.files[file][0].path}`, path);
+    const paths = { base: "", example: "", dev: "", python: "" };
 
-      const urlPath = `${process.env.URL_PAGE}/data/challenges/${challengeId}/${
-        req.files[file][0].path.split("/")[
-          req.files[file][0].path.split("/").length - 1
+    DataFrame.fromCSV(req.file["base"][0].path).then((df) => {
+      let df1 = df.drop(df1.listColumns()[df.listColumns().length]);
+      //TODO: Cambiar url donde guardar
+      let filename = new Date().getTime();
+      df1.toCSV(
+        true,
+        `./public/data/challenges/${challengeId}/` + filename + ".csv"
+      );
+      path.dev =
+        process.env.URL_PAGE +
+        `/data/challenges/${challengeId}/` +
+        filename +
+        ".csv";
+    });
+
+    const pathBase = `./public/data/challenges/${challengeId}/${
+      req.files["base"][0].path.split("/")[
+        req.files["base"][0].path.split("/").length - 1
+      ]
+    }`;
+
+    fs.renameSync(`./${req.file["base"][0].path}`, pathBase);
+
+    path.base =
+      process.env.URL_PAGE +
+      `/data/challenges/${challengeId}/${
+        req.files["base"][0].path.split("/")[
+          req.files["base"][0].path.split("/").length - 1
         ]
       }`;
-      paths.push(urlPath);
-    });
+
+    const pathExample = `./public/data/challenges/${challengeId}/${
+      req.files["example"][0].path.split("/")[
+        req.files["example"][0].path.split("/").length - 1
+      ]
+    }`;
+    fs.renameSync(`./${req.files["example"][0].path}`, pathExample);
+
+    path.example =
+      process.env.URL_PAGE +
+      `/data/challenges/${challengeId}/${
+        req.files["example"][0].path.split("/")[
+          req.files["example"][0].path.split("/").length - 1
+        ]
+      }`;
 
     await Challenge.findByIdAndUpdate(
       challengeId,
