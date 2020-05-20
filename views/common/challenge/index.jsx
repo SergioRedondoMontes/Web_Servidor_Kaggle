@@ -17,6 +17,10 @@ import { AppBar } from "../../../viewsComponents/AppBar";
 import { Card } from "../../../viewsComponents/Card";
 import { DataTables } from "../../../viewsComponents/DataTables";
 
+import JSZip from "jszip";
+import JSZipUtils from "jszip-utils";
+import FileSaver from "file-saver";
+
 import moment from "moment";
 
 import { Helmet } from "react-helmet";
@@ -167,6 +171,30 @@ const Challenge = (props) => {
     ];
   };
 
+  const urlToPromise = (url) => {
+    return new Promise(function (resolve, reject) {
+      JSZipUtils.getBinaryContent(url, function (err, data) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  };
+  const donwloadZip = () => {
+    const zip = new JSZip();
+    challenge.url_files.forEach((file, index) => {
+      const filename = `file${index}.${
+        file.split(".")[file.split(".").length - 1]
+      }`;
+      zip.file(filename, urlToPromise(file), { binary: true });
+    });
+    zip.generateAsync({ type: "blob" }).then(function (content) {
+      FileSaver.saveAs(content, "competicion.zip");
+    });
+  };
+
   const renderContentTab = () => {
     switch (valueTab) {
       case "ranking":
@@ -211,7 +239,16 @@ const Challenge = (props) => {
                 </Grid>
               ) : (
                 <Grid item xs={8}>
-                  {/* TODO FILE SAVER */}
+                  <ul>
+                    <li>
+                      <Typography variant="body1">
+                        Descarga el zip que contendrá los ficheros que necesitas
+                      </Typography>
+                      <Button variant="text" onClick={donwloadZip}>
+                        Aquí
+                      </Button>
+                    </li>
+                  </ul>
                 </Grid>
               )
             ) : (

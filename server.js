@@ -14,6 +14,8 @@ const app = express();
 (async () => {
   await register(app);
 
+  app.use(express.static(path.join(__dirname, "public")));
+
   app.use(cookieParser());
 
   require("dotenv").config({

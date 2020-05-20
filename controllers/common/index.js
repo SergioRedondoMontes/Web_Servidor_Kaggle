@@ -133,17 +133,22 @@ exports.postChallenge = async (req, res, next) => {
     });
     await newChallenge.save();
     const challengeId = newChallenge._id;
-    fs.mkdirSync(`./public/challenges/${challengeId}/`);
+    fs.mkdirSync(`./public/data/challenges/${challengeId}/`);
     const paths = [];
     Object.keys(req.files).forEach((file, index) => {
-      const path = `./public/challenges/${challengeId}/${
+      const path = `./public/data/challenges/${challengeId}/${
         req.files[file][0].path.split("/")[
           req.files[file][0].path.split("/").length - 1
         ]
       }`;
       fs.renameSync(`./${req.files[file][0].path}`, path);
 
-      paths.push(path);
+      const urlPath = `${process.env.URL_PAGE}/data/challenges/${challengeId}/${
+        req.files[file][0].path.split("/")[
+          req.files[file][0].path.split("/").length - 1
+        ]
+      }`;
+      paths.push(urlPath);
     });
 
     await Challenge.findByIdAndUpdate(
@@ -215,8 +220,9 @@ exports.updateParticipants = async (req, res, next) => {
     const challengeId = req.params.challengeId;
     const participant = await Challenge.find({
       "participant.userId": req.user._id,
+      challengeId,
     });
-    // console.log("participant", participant);
+    console.log("participant", participant);
     if (participant.length === 0) {
       await Challenge.findByIdAndUpdate(
         challengeId,
