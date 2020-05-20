@@ -130,7 +130,7 @@ router.get(
 router.post(
   "/challenges",
   middleWares.auth.checkLoggedIn,
-  upload.fields([{ name: "competition" }, { name: "test_competition" }]),
+  upload.fields([{ name: "base" }, { name: "example" }]),
   controllers.admin.postChallenge
 );
 
