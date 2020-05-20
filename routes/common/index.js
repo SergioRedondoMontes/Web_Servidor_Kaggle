@@ -43,19 +43,59 @@ router.get(
   middleWares.auth.checkExistsLoggedIn,
   controllers.common.getChallenges
 );
+router.get(
+  "/profile",
+  middleWares.auth.checkLoggedIn,
+  controllers.common.getProfile
+);
 
-router.get("/users/:userId", controllers.common.getUser);
+router.post(
+  "/profile",
+  middleWares.auth.checkLoggedIn,
+  controllers.common.updateUser
+);
 
-router.put("/users/:userId", controllers.common.updateUser);
+router.get(
+  "/profile/delete",
+  middleWares.auth.checkLoggedIn,
+  controllers.common.deleteUser
+);
 
-router.delete("/users/:userId", controllers.common.deleteUser);
-
-router.get("/challenges", controllers.common.getChallenges);
+router.get(
+  "/challenges",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthChallenger,
+  controllers.common.getMyChallenges
+);
 
 router.get(
   "/challenges/:challengeId",
   middleWares.auth.checkExistsLoggedIn,
   controllers.common.getChallenge
+);
+
+router.get(
+  "/challenges/:challengeId/edit",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthChallenger,
+  middleWares.challenge.checkAccessActionChallenge("update"),
+  controllers.common.getMyChallenge
+);
+
+router.get(
+  "/challenges/:challengeId/delete",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthChallenger,
+  middleWares.challenge.checkAccessActionChallenge("update"),
+  controllers.common.deleteChallenge
+);
+
+router.post(
+  "/challenges/:challengeId/edit",
+  middleWares.auth.checkLoggedIn,
+  middleWares.auth.checkAuthChallenger,
+  middleWares.challenge.checkAccessActionChallenge("update"),
+  controllers.common.updateChallenge
 );
 
 router.post(

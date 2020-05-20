@@ -31,7 +31,7 @@ exports.login = async (req, res, next) => {
     });
     await User.findByIdAndUpdate(user._id, { accessToken });
     res.cookie("authorization-kaggle", accessToken);
-    res.redirect("/staff/home");
+    res.redirect("/staff/users");
   } catch (error) {
     res.render("staff/login");
   }
