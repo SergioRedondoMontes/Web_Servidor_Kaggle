@@ -375,11 +375,12 @@ exports.uploadPredictions = async (req, res, next) => {
             .toArray();
 
           for (let index = 0; index < baseValues.length; index++) {
-            if ((baseValues[index] = modifyValues[index])) count++;
+            if (baseValues[index] == modifyValues[index]) count++;
           }
 
           let score = count / baseValues.length;
-
+          console.log(count);
+          console.log(baseValues.length);
           await Challenge.findByIdAndUpdate(
             req.params.challengeId,
             {
@@ -395,10 +396,7 @@ exports.uploadPredictions = async (req, res, next) => {
             function (err, updatedChallenge) {
               if (err) throw err;
               const challenge = updatedChallenge;
-              res.status(200).json({
-                data: challenge,
-                message: "Challenge has been updated",
-              });
+              res.json({ score: score });
             }
           );
         });
