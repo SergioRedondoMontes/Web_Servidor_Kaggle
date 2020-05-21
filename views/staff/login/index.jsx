@@ -20,9 +20,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
+      Kaggle | NBTech
       {new Date().getFullYear()}
       {"."}
     </Typography>
@@ -99,7 +97,7 @@ export default function SignInSide(props) {
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label="Email"
               name="email"
               autoComplete="email"
               autoFocus
@@ -114,7 +112,7 @@ export default function SignInSide(props) {
               required
               fullWidth
               name="password"
-              label="Password"
+              label="Contraseña"
               type="password"
               id="password"
               autoComplete="current-password"
@@ -130,7 +128,7 @@ export default function SignInSide(props) {
               color="primary"
               className={classes.submit}
             >
-              Sign In
+              Iniciar sesión
             </Button>
 
             <Box mt={5}>

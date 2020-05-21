@@ -33,7 +33,8 @@ exports.login = async (req, res, next) => {
     res.cookie("authorization-kaggle", accessToken);
     res.redirect("/staff/users");
   } catch (error) {
-    res.render("staff/login");
+    console.log(error);
+    // res.render("staff/login");
   }
 };
 

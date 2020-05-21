@@ -20,9 +20,9 @@ const app = express();
 
   app.use(cookieParser());
 
-  // require("dotenv").config({
-  //   path: path.join(__dirname, "../.env"),
-  // });
+  require("dotenv").config({
+    path: path.join(__dirname, "../.env"),
+  });
   const PORT = process.env.PORT || 3000;
 
   mongoose.connect(CONNECTION_URI).then(() => {

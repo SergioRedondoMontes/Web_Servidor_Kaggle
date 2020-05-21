@@ -131,7 +131,9 @@ export default function SignInSide(props) {
               >
                 Iniciar sesión
               </Button>
-
+              <Button variant="text" href="/signup">
+                Crear una nueva cuenta
+              </Button>
               <Box mt={5}>
                 <Copyright />
               </Box>

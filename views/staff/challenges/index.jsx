@@ -295,11 +295,11 @@ const ChallengesStaff = (props) => {
                 <Typography variant="body1">
                   Fichero base de la competición
                 </Typography>
-                <input type="file" name="base" />
+                <input type="file" name="base" accept=".csv" />
                 <Typography variant="body1">
                   Fichero ejemplo de la competición
                 </Typography>
-                <input type="file" name="example" />
+                <input type="file" name="example" accept=".csv" />
               </Grid>
               <Grid item xs={12}>
                 <Button

@@ -20,9 +20,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
+      KAGGLE | NBTech
       {new Date().getFullYear()}
       {"."}
     </Typography>
@@ -89,7 +87,7 @@ export default function SignInSide(props) {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Iniciar sesión
           </Typography>
           <form className={classes.form} method="post" action="/admin/login">
             {handleAlert()}
@@ -99,7 +97,7 @@ export default function SignInSide(props) {
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label="Email"
               name="email"
               autoComplete="email"
               autoFocus
@@ -114,15 +112,12 @@ export default function SignInSide(props) {
               required
               fullWidth
               name="password"
-              label="Password"
+              label="Contraseña"
               type="password"
               id="password"
               autoComplete="current-password"
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+
             <Button
               type="submit"
               fullWidth
@@ -130,7 +125,7 @@ export default function SignInSide(props) {
               color="primary"
               className={classes.submit}
             >
-              Sign In
+              Iniciar
             </Button>
 
             <Box mt={5}>
