@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const { roles } = require("../../roles");
 const fs = require("fs");
 const DataFrame = require("dataframe-js").DataFrame;
+const pyModel = require("../../public/tmp/py");
 
 async function hashPassword(password) {
   return await bcrypt.hash(password, 10);
@@ -158,24 +159,26 @@ exports.postChallenge = async (req, res, next) => {
         ]
       }`;
 
+    let filename = new Date().getTime();
+
     // CREATE DEV CSV
     DataFrame.fromCSV(paths.base)
       .then((df) => {
         let df1 = df.drop(df.listColumns()[df.listColumns().length - 1]);
-        let filename = new Date().getTime();
+
         df1.toCSV(
           true,
           `./public/data/challenges/${challengeId}/` + filename + ".csv"
         );
-        paths.dev =
-          process.env.URL_PAGE +
-          `/data/challenges/${challengeId}/` +
-          filename +
-          ".csv";
       })
       .catch((err) => {
         console.log(err);
       });
+    paths.dev =
+      process.env.URL_PAGE +
+      `/data/challenges/${challengeId}/` +
+      filename +
+      ".csv";
 
     // CREATE EXAMPLE CSV
     const pathExample = `./public/data/challenges/${challengeId}/${
@@ -193,7 +196,16 @@ exports.postChallenge = async (req, res, next) => {
         ]
       }`;
 
-    // TODO PYTHON FILE
+    // CREATE PYTHON FILE
+    fs.writeFile(
+      `./public/data/challenges/${challengeId}/competition.py`,
+      pyModel.pyTemplate(challengeId),
+      (err) => {
+        if (err) console.log(err);
+      }
+    );
+    paths.python =
+      process.env.URL_PAGE + `/data/challenges/${challengeId}/competition.py`;
 
     await Challenge.findByIdAndUpdate(
       challengeId,

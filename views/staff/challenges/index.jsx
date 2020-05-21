@@ -31,7 +31,7 @@ import { AppBar } from "../../../viewsComponents/AppBar";
 import { DatePicker } from "../../../viewsComponents/DatePicker";
 
 import moment from "moment";
-
+moment.locale("es");
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import FaceIcon from "@material-ui/icons/Face";
 

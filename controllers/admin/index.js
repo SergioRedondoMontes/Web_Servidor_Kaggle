@@ -245,7 +245,17 @@ exports.postChallenge = async (req, res, next) => {
         ]
       }`;
 
-    // TODO PYTHON FILE
+    // CREATE PYTHON FILE
+    fs.writeFile(
+      `./public/data/challenges/${challengeId}/competition.py`,
+      pyModel.pyTemplate(challengeId),
+      (err) => {
+        if (err) console.log(err);
+      }
+    );
+    paths.python =
+      process.env.URL_PAGE + `/data/challenges/${challengeId}/competition.py`;
+
     await Challenge.findByIdAndUpdate(
       challengeId,
       { url_files: paths },

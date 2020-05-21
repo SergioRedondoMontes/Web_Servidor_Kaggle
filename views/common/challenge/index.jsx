@@ -22,6 +22,7 @@ import JSZipUtils from "jszip-utils";
 import FileSaver from "file-saver";
 
 import moment from "moment";
+moment.locale("es");
 
 import { Helmet } from "react-helmet";
 import { Chip, Divider, Tabs, Tab } from "@material-ui/core";
@@ -186,7 +187,7 @@ const Challenge = (props) => {
     const zip = new JSZip();
 
     // EXAMPLE
-    const filenameExample = `example.${
+    const filenameExample = `dev.${
       challenge.url_files.example.split(".")[
         challenge.url_files.example.split(".").length - 1
       ]
@@ -195,7 +196,7 @@ const Challenge = (props) => {
       binary: true,
     });
     // DEV
-    const filenameDev = `dev.${
+    const filenameDev = `oot0.${
       challenge.url_files.dev.split(".")[
         challenge.url_files.dev.split(".").length - 1
       ]
@@ -203,9 +204,18 @@ const Challenge = (props) => {
     zip.file(filenameDev, urlToPromise(challenge.url_files.dev), {
       binary: true,
     });
-    // TODO PYTHON FILE
+    // PYTHON
+    const filenameCompetition = `competition.${
+      challenge.url_files.python.split(".")[
+        challenge.url_files.python.split(".").length - 1
+      ]
+    }`;
+    zip.file(filenameCompetition, urlToPromise(challenge.url_files.python), {
+      binary: true,
+    });
+
     zip.generateAsync({ type: "blob" }).then(function (content) {
-      FileSaver.saveAs(content, "competicion.zip");
+      FileSaver.saveAs(content, "competition.zip");
     });
   };
 
@@ -324,9 +334,10 @@ const Challenge = (props) => {
         style={{
           height: "50vh",
           background: "url('https://source.unsplash.com/random')",
+          backgroundSize: "100vw",
         }}
       ></Grid>
-      <Grid itemx xs={1} />
+      <Grid item xs={1} />
       <Grid item xs={10}>
         {handleAlert()}
         <div style={{ display: "flex", alignItems: "center" }}>
