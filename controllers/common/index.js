@@ -370,9 +370,9 @@ exports.uploadPredictions = async (req, res, next) => {
           df.listColumns()[df.listColumns().length - 1],
           (row, j) => {
             if (baseValues[j][0] < 0.5) {
-              return 0;
+              baseValues[j][0] = "0";
             } else {
-              return 1;
+              baseValues[j][0] = "1";
             }
           }
         );
@@ -386,12 +386,13 @@ exports.uploadPredictions = async (req, res, next) => {
             .toArray();
 
           for (let index = 0; index < baseValues.length; index++) {
-            if (baseValues[index] == modifyValues[index]) count++;
+            if (baseValues[index][0] == modifyValues[index][0]) {
+              count += 1;
+            }
           }
 
           let score = count / baseValues.length;
-          console.log(count);
-          console.log(baseValues.length);
+
           await Challenge.findByIdAndUpdate(
             req.params.challengeId,
             {
