@@ -156,6 +156,7 @@ const Challenge = (props) => {
         name: "score",
         label: "Puntuación",
         options: {
+          sortDirection: "desc",
           filter: true,
         },
       },
